@@ -1,0 +1,267 @@
+<!DOCTYPE html><html lang="fi"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kertotauluseikkailu!</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .peli-laatikko {
+            background-color: white;
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            max-width: 550px;
+            width: 100%;
+            border: 8px solid #ffd166;
+        }
+        h1 {
+            color: #ef476f;
+            font-size: 2.5em;
+            margin-top: 0;
+            text-shadow: 2px 2px #ffe66d;
+        }
+        .pisteet-laatikko {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #073b4c;
+        }
+        .valinta-alue {
+            margin-bottom: 20px;
+            background-color: #e0fbfc;
+            padding: 15px;
+            border-radius: 20px;
+        }
+        .valinta-alue p {
+            margin: 0 0 10px 0;
+            font-weight: bold;
+            color: #118ab2;
+        }
+        .taulu-napit {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        .taulu-nappi {
+            background-color: #ffd166;
+            border: none;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            font-family: inherit;
+        }
+        .taulu-nappi.aktiivinen {
+            background-color: #06d6a0;
+            color: white;
+            transform: scale(1.1);
+        }
+        .lasku-alue {
+            font-size: 4em;
+            font-weight: bold;
+            color: #073b4c;
+            margin: 20px 0;
+            background-color: #fff3b0;
+            padding: 20px;
+            border-radius: 25px;
+            border: 4px dashed #ffd166;
+        }
+        .vastaus-syote {
+            font-size: 2.5em;
+            width: 140px;
+            text-align: center;
+            padding: 10px;
+            border: 4px solid #118ab2;
+            border-radius: 20px;
+            font-family: inherit;
+            margin-bottom: 20px;
+            outline: none;
+        }
+        .vastaus-syote:focus {
+            border-color: #ef476f;
+        }
+        .tarkista-nappi {
+            background-color: #06d6a0;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 40px;
+            font-size: 1.8em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #049a73;
+            transition: all 0.1s;
+            font-family: inherit;
+            display: block;
+            margin: 0 auto;
+        }
+        .tarkista-nappi:active {
+            transform: translateY(6px);
+            box-shadow: 0 0 0 #049a73;
+        }
+        .palaute {
+            font-size: 1.6em;
+            font-weight: bold;
+            min-height: 45px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .oikein { color: #06d6a0; }
+        .vaarin { color: #ef476f; }
+        .palkinto-alue {
+            font-size: 2em;
+            margin-top: 15px;
+            min-height: 45px;
+        }
+    </style></head><body>
+<div class="peli-laatikko">
+    <h1> Kertotaulupeli!</h1>
+        <div class="pisteet-laatikko">
+        <div> Pisteet: <span id="pisteet">0</span></div>
+        <div> Putki: <span id="putki">0</span></div>
+    </div>
+
+    <div class="valinta-alue">
+        <p>Valitse kertotaulut (klikkaa päälle/pois):</p>
+        <div class="taulu-napit" id="taulu-napit"></div>
+    </div>
+
+    <div class="lasku-alue" id="lasku">2 × 5 = ?</div>
+
+    <input type="number" id="vastaus" class="vastaus-syote" placeholder="?" autocomplete="off">
+    <button class="tarkista-nappi" onclick="tarkistaVastaus()">Tarkista! </button>
+
+    <div class="palaute" id="palaute"></div>
+    <div class="palkinto-alue" id="palkinnot" title="Ansaitut mitalit"></div></div>
+<script>
+    let pisteet = 0;
+    let putki = 0;
+    let luku1 = 2;
+    let luku2 = 5;
+    // Oletuksena valittuna helpot kertotaulut 2, 5 ja 10
+    let valitutTaulut = [2, 5, 10];
+
+    const kannustukset = [
+        "Mahtavaa! ",
+        "Superhienoa! ",
+        "Olet matematiikkavelho! ",
+        "Täysosuma! ",
+        "Upeaa työtä! ",
+        "Jatka samaan malliin! "
+    ];
+
+    const palkintoEmojit = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
+
+    // Luodaan valintanapit kertotauluille 1-10
+    const napitAlue = document.getElementById("taulu-napit");
+    for (let i = 1; i <= 10; i++) {
+        const nappi = document.createElement("button");
+        nappi.innerText = i;
+        nappi.className = "taulu-nappi" + (valitutTaulut.includes(i) ? " aktiivinen" : "");
+        nappi.onclick = () => {
+            if (valitutTaulut.includes(i)) {
+                // Estetään kaikkien poistaminen
+                if (valitutTaulut.length > 1) {
+                    valitutTaulut = valitutTaulut.filter(t => t !== i);
+                    nappi.classList.remove("aktiivinen");
+                }
+            } else {
+                valitutTaulut.push(i);
+                nappi.classList.add("aktiivinen");
+            }
+            uusiLasku();
+        };
+        napitAlue.appendChild(nappi);
+    }
+
+    function uusiLasku() {
+        // Arvotaan kertotaulu valituista
+        const satunnainenIndeksi = Math.floor(Math.random() * valitutTaulut.length);
+        luku1 = valitutTaulut[satunnainenIndeksi];
+        // Arvotaan kertoja 1-10 väliltä
+        luku2 = Math.floor(Math.random() * 10) + 1;
+        // Arvotaan välillä kummin päin luvut näytetään (esim. 2x5 tai 5x2)
+        if (Math.random() > 0.5) {
+            document.getElementById("lasku").innerText = `${luku1} × ${luku2} = ?`;
+        } else {
+            document.getElementById("lasku").innerText = `${luku2} × ${luku1} = ?`;
+        }
+
+        const syote = document.getElementById("vastaus");
+        syote.value = "";
+        syote.focus();
+    }
+
+    function tarkistaVastaus() {
+        const syote = document.getElementById("vastaus");
+        const kayttajanVastaus = parseInt(syote.value);
+        const palauteEl = document.getElementById("palaute");
+        const oikeaVastaus = luku1 * luku2;
+
+        if (isNaN(kayttajanVastaus)) {
+            palauteEl.innerText = "Kirjoita ensin numero laatikkoon! ";
+            palauteEl.className = "palaute vaarin";
+            syote.focus();
+            return;
+        }
+
+        if (kayttajanVastaus === oikeaVastaus) {
+            pisteet++;
+            putki++;
+            document.getElementById("pisteet").innerText = pisteet;
+            document.getElementById("putki").innerText = putki;
+
+            const satunnainenKehuminen = kannustukset[Math.floor(Math.random() * kannustukset.length)];
+            palauteEl.innerText = satunnainenKehuminen;
+            palauteEl.className = "palaute oikein";
+
+            // Annetaan palkinto joka 5. oikeasta vastauksesta
+            if (pisteet % 5 === 0) {
+                const palkintoIndeksi = Math.min(Math.floor(pisteet / 5) - 1, palkintoEmojit.length - 1);
+                document.getElementById("palkinnot").innerText += palkintoEmojit[palkintoIndeksi] + " ";
+            }
+
+            setTimeout(uusiLasku, 1200);
+        } else {
+            putki = 0;
+            document.getElementById("putki").innerText = putki;
+            palauteEl.innerText = `Hups! Yritä uudelleen! (Vinkki: ei ollut ${kayttajanVastaus}) `;
+            palauteEl.className = "palaute vaarin";
+            syote.value = "";
+            syote.focus();
+        }
+    }
+
+    // Mahdollistetaan vastaaminen myös painamalla Enter-näppäintä
+    document.getElementById("vastaus").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            tarkistaVastaus();
+        }
+    });
+
+    // Käynnistetään peli ensimmäisellä laskulla
+    uusiLasku();
+</script>
+</body></html>
