@@ -304,6 +304,14 @@
 
         .kauppa-nappi.alusta-nappi { background-color: #868e96; }
         .pikanapit { flex-wrap: wrap; }
+        .alapalkki {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 10px;
+            border-top: 2px dashed var(--reuna);
+        }
 
         /* Teemavalikko */
         .teema-laatikko { max-width: 92%; }
@@ -493,7 +501,7 @@
 
         /* Kissan tavarat */
         .kissa-iso { position: relative; }
-        .kissa-hattu, .kissa-lasit {
+        .kissa-hattu, .kissa-lasit, .kissa-kaula {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
@@ -503,6 +511,7 @@
         }
         .kissa-hattu { top: -0.28em; }
         .kissa-lasit { top: 0.42em; }
+        .kissa-kaula { top: 0.82em; font-size: 0.45em; }
         /* Koko kissa (🐈 🐆 🐅): tavarat näytetään kissan yläpuolella, koska pää on eri kohdassa */
         .kissa-iso.vartalo { margin-top: 8px; }
         .kissa-iso.vartalo .kissa-hattu, .koti-kissa.vartalo .kissa-hattu { top: -0.5em; left: 30%; }
@@ -538,8 +547,8 @@
         .kauppa-kalat { font-size: 1.3em; font-weight: bold; color: #073b4c; background: var(--paneeli1); border-radius: 16px; padding: 8px; }
         .tavara-ruudukko {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
         .tavara {
             background: var(--paneeli2);
@@ -555,7 +564,7 @@
             color: #073b4c;
         }
         .tavara .tavara-emoji { font-size: 2em; line-height: 1.1; }
-        .tavara .tavara-nimi { font-weight: bold; }
+        .tavara .tavara-nimi { font-weight: bold; font-size: 0.85em; line-height: 1.15; }
         .tavara .tavara-hinta { font-size: 0.9em; }
         .tavara.omistettu { background: #e6f7f0; }
         .tavara.paalla { border-color: #2a9d8f; background: #d4f5e9; }
@@ -591,7 +600,7 @@
 <div class="tausta-kissat" id="tausta-kissat" aria-hidden="true"></div>
 <div class="peli-laatikko">
     <h1>🐾 Kissojen kertotaulupeli! 🐾</h1>
-    <div class="kissa-iso" id="kissa-iso"><span id="kissa-naama">😺</span><span class="kissa-hattu" id="kissa-hattu"></span><span class="kissa-lasit" id="kissa-lasit"></span></div>
+    <div class="kissa-iso" id="kissa-iso"><span id="kissa-naama">😺</span><span class="kissa-hattu" id="kissa-hattu"></span><span class="kissa-lasit" id="kissa-lasit"></span><span class="kissa-kaula" id="kissa-kaula"></span></div>
         <div class="pisteet-laatikko">
         <div>🐟 Kalat: <span id="pisteet">0</span></div>
         <div>🐾 Askeleet: <span id="putki">0</span></div>
@@ -600,8 +609,6 @@
             <button class="kauppa-nappi" onclick="avaaKoti()">🏠 Koti</button>
             <button class="kauppa-nappi" onclick="avaaPassi()">📘 Passi</button>
             <button class="kauppa-nappi" onclick="avaaKissaValikko()">🐱 Kissa</button>
-            <button class="kauppa-nappi" onclick="avaaTeemaValikko()">🎨 Teema</button>
-            <button class="kauppa-nappi alusta-nappi" onclick="avaaAlustaKysymys()">🔄 Alusta</button>
         </div>
     </div>
 
@@ -621,6 +628,12 @@
 
     <div class="palaute" id="palaute"></div>
     <div class="palkinto-alue" id="palkinnot" title="Kerätyt kissat"></div>
+
+    <!-- Asetukset sivun alaosassa -->
+    <div class="alapalkki">
+        <button class="kauppa-nappi" onclick="avaaTeemaValikko()">🎨 Teema</button>
+        <button class="kauppa-nappi alusta-nappi" onclick="avaaAlustaKysymys()">🔄 Alusta</button>
+    </div>
 
     <div class="nimi-ikkuna" id="kissa-ikkuna" hidden style="z-index: 9">
         <div class="nimi-laatikko teema-laatikko">
@@ -1089,19 +1102,26 @@
     }
 
     // ---------- Kalakauppa ----------
-    // paikka "paa" = päähän, "silmat" = silmille. Kummassakin voi olla vain yksi tavara kerrallaan.
+    // paikka "paa" = päähän, "silmat" = silmille, "kaula" = kaulaan.
+    // Jokaisessa paikassa voi olla vain yksi tavara kerrallaan. Hinnat ovat kaloja.
     const tavarat = [
-        { id: "rusetti", emoji: "🎀", nimi: "Rusetti", hinta: 3, paikka: "paa" },
-        { id: "lippis", emoji: "🧢", nimi: "Lippis", hinta: 4, paikka: "paa" },
-        { id: "silmalasit", emoji: "👓", nimi: "Silmälasit", hinta: 4, paikka: "silmat" },
-        { id: "aurinkolasit", emoji: "🕶️", nimi: "Aurinkolasit", hinta: 5, paikka: "silmat" },
-        { id: "silinteri", emoji: "🎩", nimi: "Silinterihattu", hinta: 6, paikka: "paa" },
-        { id: "kruunu", emoji: "👑", nimi: "Kruunu", hinta: 10, paikka: "paa" }
+        { id: "rusetti", emoji: "🎀", nimi: "Rusetti", hinta: 15, paikka: "paa" },
+        { id: "lippis", emoji: "🧢", nimi: "Lippis", hinta: 20, paikka: "paa" },
+        { id: "olkihattu", emoji: "👒", nimi: "Olkihattu", hinta: 25, paikka: "paa" },
+        { id: "silinteri", emoji: "🎩", nimi: "Silinteri", hinta: 40, paikka: "paa" },
+        { id: "opiskelijalakki", emoji: "🎓", nimi: "Tohtorilakki", hinta: 50, paikka: "paa" },
+        { id: "kruunu", emoji: "👑", nimi: "Kruunu", hinta: 100, paikka: "paa" },
+        { id: "silmalasit", emoji: "👓", nimi: "Silmälasit", hinta: 20, paikka: "silmat" },
+        { id: "aurinkolasit", emoji: "🕶️", nimi: "Aurinkolasit", hinta: 30, paikka: "silmat" },
+        { id: "sukelluslasit", emoji: "🥽", nimi: "Sukellus-lasit", hinta: 45, paikka: "silmat" },
+        { id: "kello", emoji: "🔔", nimi: "Kilisevä kello", hinta: 25, paikka: "kaula" },
+        { id: "huivi", emoji: "🧣", nimi: "Huivi", hinta: 35, paikka: "kaula" },
+        { id: "mitali", emoji: "🏅", nimi: "Kultamitali", hinta: 60, paikka: "kaula" }
     ];
     const TALLENNUS = "kissapeli-kauppa";
     let kalat = 0;
     let omistetut = [];
-    let paalla = { paa: null, silmat: null };
+    let paalla = { paa: null, silmat: null, kaula: null };
     let kodinKissat = []; // mitaleista tulleet kissat, jotka asuvat kotona
     let kissojenNimet = []; // kodin kissojen nimet (samassa järjestyksessä kuin kodinKissat)
     let omaNimi = "Mirri";  // oman kissan nimi
@@ -1189,7 +1209,7 @@
             });
             document.getElementById("palkinnot").innerText = kodinKissat.map(e => e + " ").join("");
             omistetut = (Array.isArray(d.omistetut) ? d.omistetut : []).filter(id => haeTavara(id));
-            for (const paikka of ["paa", "silmat"]) {
+            for (const paikka of ["paa", "silmat", "kaula"]) {
                 const id = d.paalla && d.paalla[paikka];
                 paalla[paikka] = (id && omistetut.includes(id)) ? id : null;
             }
@@ -1206,6 +1226,7 @@
     function paivitaKissa() {
         const hattu = paalla.paa ? haeTavara(paalla.paa).emoji : "";
         const lasit = paalla.silmat ? haeTavara(paalla.silmat).emoji : "";
+        document.getElementById("kissa-kaula").innerText = paalla.kaula ? haeTavara(paalla.kaula).emoji : "";
         document.getElementById("kissa-hattu").innerText = hattu;
         document.getElementById("kissa-lasit").innerText = lasit;
     }
@@ -1270,15 +1291,58 @@
 
     // ---------- Huonekalut kotiin ----------
     // x ja y ovat paikka huoneessa prosentteina (vasen ja ylä)
+    // Akvaariolle ei ole omaa emojia, joten se on piirretty itse (SVG-kuva): lasiallas, vettä, hiekkaa, kasveja ja kala.
+    const AKVAARIO_SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 56'>" +
+        "<rect x='4' y='8' width='56' height='42' rx='6' fill='#bde9ff' stroke='#4aa3d8' stroke-width='3'/>" +
+        "<rect x='6' y='10' width='52' height='7' rx='3' fill='#e6f6ff' opacity='0.9'/>" +
+        "<path d='M6 43 h52 v3 a4 4 0 0 1 -4 4 h-44 a4 4 0 0 1 -4 -4z' fill='#f0d58c'/>" +
+        "<path d='M14 43 q-5 -9 0 -17 M19 43 q5 -8 0 -13 M48 43 q4 -8 0 -14' stroke='#2b8a3e' stroke-width='3' fill='none' stroke-linecap='round'/>" +
+        "<ellipse cx='34' cy='29' rx='9' ry='6' fill='#ff8c42'/>" +
+        "<polygon points='42,29 50,22 50,36' fill='#ff8c42'/>" +
+        "<circle cx='29' cy='27' r='1.7' fill='#073b4c'/>" +
+        "<circle cx='24' cy='21' r='2' fill='#fff'/><circle cx='28' cy='15' r='1.5' fill='#fff'/>" +
+        "<rect x='2' y='4' width='60' height='6' rx='3' fill='#4aa3d8'/>" +
+        "</svg>";
+
+    // Raapimispuu: jalusta, sisalköydellä kiedottu tolppa, pehmeä taso ylhäällä ja roikkuva pallo.
+    const RAAPIMISPUU_SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 64'>" +
+        "<rect x='4' y='54' width='40' height='8' rx='3' fill='#8d6a4a'/>" +
+        "<rect x='19' y='14' width='10' height='42' fill='#e3c48a'/>" +
+        "<path d='M19 18h10M19 22h10M19 26h10M19 30h10M19 34h10M19 38h10M19 42h10M19 46h10M19 50h10' stroke='#b98f4e' stroke-width='1.6'/>" +
+        "<rect x='5' y='8' width='38' height='8' rx='3' fill='#8d6a4a'/>" +
+        "<rect x='7' y='4' width='34' height='7' rx='3.5' fill='#ff9f68'/>" +
+        "<path d='M38 16 V33' stroke='#666' stroke-width='1.4'/>" +
+        "<circle cx='38' cy='37' r='4.2' fill='#ef476f'/><circle cx='36.6' cy='35.6' r='1.2' fill='#fff' opacity='0.7'/>" +
+        "</svg>";
+
+    // Näyttää tuotteen kuvakkeen: oma SVG-kuva jos sellainen on, muuten emoji
+    function asetaKuvake(el, k) {
+        if (k.svg) {
+            const img = new Image();
+            img.src = "data:image/svg+xml," + encodeURIComponent(k.svg);
+            img.alt = k.nimi;
+            img.style.cssText = "width: 1.3em; height: auto; vertical-align: middle; pointer-events: none;";
+            el.appendChild(img);
+        } else {
+            el.innerText = k.emoji;
+        }
+    }
+
     const huonekalut = [
-        { id: "laatikko", emoji: "📦", nimi: "Pahvilaatikko", hinta: 2, x: 58, y: 64, koko: 2.2 },
-        { id: "pallo", emoji: "⚽", nimi: "Pallo", hinta: 3, x: 76, y: 62, koko: 1.4 },
-        { id: "nalle", emoji: "🧸", nimi: "Nalle", hinta: 4, x: 22, y: 78, koko: 1.8 },
-        { id: "peili", emoji: "🪞", nimi: "Peili", hinta: 5, x: 36, y: 6, koko: 2 },
-        { id: "kalamalja", emoji: "🐠", nimi: "Kalamalja", hinta: 6, x: 50, y: 28, koko: 1.8 },
-        { id: "sanky", emoji: "🛏️", nimi: "Kissan sänky", hinta: 8, x: 4, y: 62, koko: 2.4 },
-        { id: "televisio", emoji: "📺", nimi: "Televisio", hinta: 10, x: 22, y: 28, koko: 2.2 },
-        { id: "kissapuu", emoji: "🌳", nimi: "Kissapuu", hinta: 12, x: 80, y: 4, koko: 2.6 }
+        { id: "laatikko", emoji: "📦", nimi: "Pahvilaatikko", hinta: 10, x: 58, y: 64, koko: 2.2 },
+        { id: "ilmapallo", emoji: "🎈", nimi: "Ilmapallo", hinta: 12, x: 50, y: 8, koko: 1.8 },
+        { id: "pallo", emoji: "⚽", nimi: "Pallo", hinta: 15, x: 48, y: 74, koko: 1.4 },
+        { id: "maitokuppi", emoji: "🥛", nimi: "Maitolasi", hinta: 18, x: 30, y: 88, koko: 1.3 },
+        { id: "nalle", emoji: "🧸", nimi: "Nalle", hinta: 20, x: 22, y: 78, koko: 1.8 },
+        { id: "peili", emoji: "🪞", nimi: "Peili", hinta: 25, x: 36, y: 6, koko: 2 },
+        { id: "kirjahylly", emoji: "📚", nimi: "Kirjat", hinta: 30, x: 88, y: 20, koko: 1.8 },
+        { id: "kalamalja", emoji: "🐠", svg: AKVAARIO_SVG, nimi: "Akvaario", hinta: 35, x: 48, y: 26, koko: 2.6 },
+        { id: "sanky", emoji: "🛏️", nimi: "Kissan sänky", hinta: 50, x: 4, y: 62, koko: 2.4 },
+        { id: "kitara", emoji: "🎸", nimi: "Kitara", hinta: 60, x: 66, y: 78, koko: 2 },
+        { id: "televisio", emoji: "📺", nimi: "Televisio", hinta: 70, x: 22, y: 28, koko: 2.2 },
+        { id: "piano", emoji: "🎹", nimi: "Piano", hinta: 90, x: 28, y: 56, koko: 2.2 },
+        { id: "kissapuu", emoji: "🐾", svg: RAAPIMISPUU_SVG, nimi: "Raapimispuu", hinta: 100, x: 80, y: 40, koko: 2.0 },
+        { id: "linna", emoji: "🏰", nimi: "Kissalinna", hinta: 150, x: 42, y: 38, koko: 3 }
     ];
     let kalusteet = [];            // ostetut huonekalut
     let kauppaValilehti = "kissa"; // "kissa" tai "koti"
@@ -1302,7 +1366,7 @@
             nappi.className = "tavara" + (omistan ? " paalla" : "");
             const e = document.createElement("span");
             e.className = "tavara-emoji";
-            e.innerText = k.emoji;
+            asetaKuvake(e, k);
             const n = document.createElement("span");
             n.className = "tavara-nimi";
             n.innerText = k.nimi;
@@ -1341,7 +1405,7 @@
             const el = document.createElement("span");
             el.className = "sisustus osto leikkikalu";
             el.dataset.leikki = k.id;
-            el.innerText = k.emoji;
+            asetaKuvake(el, k);
             el.style.left = k.x + "%";
             el.style.top = k.y + "%";
             el.style.fontSize = k.koko + "em";
@@ -1381,7 +1445,10 @@
             const lasit = document.createElement("span");
             lasit.className = "kissa-lasit";
             lasit.innerText = paalla.silmat ? haeTavara(paalla.silmat).emoji : "";
-            el.append(hattu, lasit);
+            const kaula = document.createElement("span");
+            kaula.className = "kissa-kaula";
+            kaula.innerText = paalla.kaula ? haeTavara(paalla.kaula).emoji : "";
+            el.append(hattu, lasit, kaula);
         }
         // nimilappu kissan alla: sitä koskettamalla voi antaa kissalle uuden nimen
         const lappu = document.createElement("span");
@@ -1894,7 +1961,7 @@
         putki = 0;
         kalat = 0;
         omistetut = [];
-        paalla = { paa: null, silmat: null };
+        paalla = { paa: null, silmat: null, kaula: null };
         kodinKissat = [];
         kissojenNimet = [];
         omaNimi = "Mirri";
@@ -2038,7 +2105,9 @@
     const reaktiot = {
         lanka: "🧶 Hui!", kuppi: "😋 Nam!", laatikko: "📦 Sisällä! 😻", pallo: "⚽ Pomp!",
         nalle: "🧸 💕", peili: "🪞 ✨", kalamalja: "🐠 👀", sanky: "💤 Zzz",
-        televisio: "📺 👀", kissapuu: "🌳 😼"
+        televisio: "📺 👀", kissapuu: "🐾 Raaps!",
+        ilmapallo: "🎈 Pamps!", maitokuppi: "🥛 Mmm!", kirjahylly: "📚 Hmm...", kitara: "🎸 Plim!",
+        piano: "🎹 Plim plom!", linna: "🏰 Kuningatar!"
     };
     const peruspaikat = [
         { id: "lanka", x: 42, y: 84 },
