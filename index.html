@@ -190,6 +190,68 @@
             margin-top: 15px;
             min-height: 45px;
         }
+        /* Leimapassi */
+        .passi-ruudukko {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+        .leima {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--v, var(--aksentti));
+            color: var(--v, var(--aksentti));
+            background: #fff;
+            font-size: 1.7em;
+            line-height: 1;
+            transform: rotate(var(--k, 0deg));
+        }
+        .leima small { font-size: 0.34em; font-weight: bold; margin-top: 2px; color: #073b4c; }
+        .leima.tyhja {
+            border: 3px dashed #ced4da;
+            color: #adb5bd;
+            background: transparent;
+            font-size: 1.1em;
+            transform: none;
+        }
+        .leima.tyhja.bonus {
+            border: 3px dashed var(--aksentti);
+            color: var(--aksentti);
+            opacity: 1;
+            background: var(--paneeli1);
+        }
+        .leima.tyhja.bonus small { color: var(--aksentti); }
+        .leima.uusi { animation: leimaus 0.7s ease-out; }
+        @keyframes leimaus {
+            0% { transform: scale(2.2) rotate(-30deg); opacity: 0; }
+            70% { transform: scale(0.9) rotate(var(--k, 0deg)); opacity: 1; }
+            100% { transform: scale(1) rotate(var(--k, 0deg)); }
+        }
+        .ilmoitus {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 7;
+            background: var(--aksentti);
+            color: white;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 18px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+            white-space: nowrap;
+            animation: ilmoitus-sisaan 0.4s ease-out;
+        }
+        .ilmoitus[hidden] { display: none; }
+        @keyframes ilmoitus-sisaan {
+            from { transform: translate(-50%, -20px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
         /* Kaupan välilehdet */
         .valilehdet { display: flex; gap: 8px; justify-content: center; }
         .valilehti {
@@ -536,6 +598,7 @@
         <div class="pikanapit">
             <button class="kauppa-nappi" onclick="avaaKauppa()">🛒 Kauppa</button>
             <button class="kauppa-nappi" onclick="avaaKoti()">🏠 Koti</button>
+            <button class="kauppa-nappi" onclick="avaaPassi()">📘 Passi</button>
             <button class="kauppa-nappi" onclick="avaaKissaValikko()">🐱 Kissa</button>
             <button class="kauppa-nappi" onclick="avaaTeemaValikko()">🎨 Teema</button>
             <button class="kauppa-nappi alusta-nappi" onclick="avaaAlustaKysymys()">🔄 Alusta</button>
@@ -597,12 +660,22 @@
     <div class="nimi-ikkuna" id="alusta-ikkuna" hidden style="z-index: 9">
         <div class="nimi-laatikko">
             <div>🔄 Aloitetaanko peli alusta?</div>
-            <div style="font-size: 0.85em; color: #073b4c">Kaikki kalat, kissat, tavarat ja huonekalut katoavat.</div>
+            <div style="font-size: 0.85em; color: #073b4c">Kaikki kalat, kissat, tavarat ja huonekalut katoavat. Leimapassi säilyy. 📘</div>
             <div class="nimi-napit">
                 <button class="kauppa-nappi alusta-nappi" onclick="alustaPeli()">Kyllä, alusta</button>
                 <button class="kauppa-nappi" onclick="suljeAlustaKysymys()">Ei, jatka 🐾</button>
             </div>
         </div>
+    </div>
+
+    <div class="ilmoitus" id="ilmoitus" hidden></div>
+
+    <div class="kauppa" id="passi" hidden>
+        <h2>📘 Kissapassi 📘</h2>
+        <div class="kauppa-kalat" id="passi-tiedot"></div>
+        <div class="passi-ruudukko" id="passi-ruudukko"></div>
+        <div class="kauppa-viesti">Saat leiman, kun pelaat uutena päivänä ja vastaat ainakin yhden laskun oikein! Joka 5. leimasta saat bonuskaloja: 5. leimasta 5 kalaa, 10. leimasta 10 kalaa, 15. leimasta 15 kalaa... 🐟</div>
+        <button class="tarkista-nappi kauppa-sulje" onclick="suljePassi()">Valmis! 🐾</button>
     </div>
 
     <div class="kauppa" id="kauppa" hidden>
@@ -775,15 +848,39 @@
         uusiLasku();
     }
 
+    // Lukee vastauksen tarkasti kokonaislukuna. Pelkät numerot kelpaavat ("12"),
+    // desimaaliluvut eivät ("2,2", "2.5", "2.0"), eikä lopun roskaa hyväksytä ("2abc").
+    function lueKokonaisluku(teksti) {
+        const t = String(teksti).trim();
+        if (/^\d+$/.test(t)) return { tila: "ok", arvo: parseInt(t, 10) };
+        if (t !== "" && Number.isFinite(Number(t.replace(",", ".")))) return { tila: "desimaali" };
+        return { tila: "tyhja" };
+    }
+
+    // Estetään pilkun, pisteen ja muiden merkkien kirjoittaminen vastauskenttiin
+    function vainKokonaisluvut(syote) {
+        syote.addEventListener("keydown", (e) => {
+            if ([",", ".", "e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+        });
+        syote.step = "1";
+    }
+    vainKokonaisluvut(document.getElementById("vastaus"));
+    vainKokonaisluvut(document.getElementById("vahti-syote"));
+
     function tarkistaVastaus() {
         const syote = document.getElementById("vastaus");
-        const kayttajanVastaus = parseInt(syote.value);
+        const luettu = lueKokonaisluku(syote.value);
+        const kayttajanVastaus = luettu.arvo;
         const palauteEl = document.getElementById("palaute");
         const oikeaVastaus = luku1 * luku2;
 
-        if (isNaN(kayttajanVastaus)) {
-            palauteEl.innerText = "🐱 Kirjoita ensin numero laatikkoon!";
+        // Vastauksen pitää olla kokonaisluku: "2,2" tai "2.5" ei kelpaa, eikä se myöskään nollaa askeleita
+        if (luettu.tila !== "ok") {
+            palauteEl.innerText = luettu.tila === "desimaali"
+                ? "🐱 Kirjoita vain numeroita, ilman pilkkua!"
+                : "🐱 Kirjoita ensin numero laatikkoon!";
             palauteEl.className = "palaute vaarin";
+            syote.value = "";
             syote.focus();
             return;
         }
@@ -791,6 +888,7 @@
         if (kayttajanVastaus === oikeaVastaus) {
             pisteet++;
             putki++;
+            annaLeima(); // uusi päivä: leima passiin
             kalat++; // jokaisesta oikeasta vastauksesta saa kalan
             paivitaKalat();
             tallenna();
@@ -1054,7 +1152,7 @@
     }
 
     function tallenna() {
-        kirjoitaTallennus(JSON.stringify({ kalat, omistetut, paalla, pisteet, kodinKissat, kalusteet, omaNimi, nimet: kissojenNimet, teema, tila, kissaVari, kissaMuoto }));
+        kirjoitaTallennus(JSON.stringify({ kalat, omistetut, paalla, pisteet, kodinKissat, kalusteet, omaNimi, nimet: kissojenNimet, teema, tila, kissaVari, kissaMuoto, leimat }));
     }
 
     function lataa() {
@@ -1069,6 +1167,13 @@
             tila = d.tila === "kuvat" ? "kuvat" : "numerot";
             kissaVari = haeKissaVari(d.kissaVari).id;
             kissaMuoto = haeMuoto(d.kissaMuoto).id;
+            // leimat: vain kelvolliset päivämäärät, kukin päivä kerran
+            const nahdyt = new Set();
+            leimat = (Array.isArray(d.leimat) ? d.leimat : []).filter(l => {
+                const ok = l && /^\d{4}-\d{2}-\d{2}$/.test(l.pvm) && typeof l.kuva === "string" && !nahdyt.has(l.pvm);
+                if (ok) nahdyt.add(l.pvm);
+                return ok;
+            }).map(l => ({ pvm: l.pvm, kuva: l.kuva.slice(0, 8) }));
             const raakaKissat = Array.isArray(d.kodinKissat) ? d.kodinKissat : [];
             const raakaNimet = Array.isArray(d.nimet) ? d.nimet : [];
             kodinKissat = [];
@@ -1444,6 +1549,124 @@
         document.getElementById("vastaus").focus();
     }
 
+    // ---------- Leimapassi ----------
+    // Yksi leima jokaisesta päivästä, jona vastaa ainakin yhden laskun oikein.
+    const leimaKuvat = ["🐱", "🐟", "🐾", "🧶", "⭐", "🐭", "❤️", "🎩", "🐈", "🌟"];
+    const leimaVarit = ["#d62839", "#1c7ed6", "#2b8a3e", "#7b3fc4"];
+    const LEIMA_BONUSVALI = 5;   // joka 5. leimasta saa bonuksen (5., 10., 15. ...)
+    let leimat = []; // [{ pvm: "2026-11-20", kuva: "🐱" }, ...]
+    let uusinLeima = null; // pvm, jonka leima animoidaan, kun passi avataan
+
+    function pvmTeksti(d) {
+        const kk = String(d.getMonth() + 1).padStart(2, "0");
+        const pv = String(d.getDate()).padStart(2, "0");
+        return `${d.getFullYear()}-${kk}-${pv}`;
+    }
+
+    function tanaanPvm() {
+        return pvmTeksti(new Date());
+    }
+
+    // montako päivää kahden päivämäärän välillä (a - b)
+    function paivaEro(a, b) {
+        const [ay, am, ad] = a.split("-").map(Number);
+        const [by, bm, bd] = b.split("-").map(Number);
+        return Math.round((new Date(ay, am - 1, ad) - new Date(by, bm - 1, bd)) / 86400000);
+    }
+
+    // Montako päivää peräkkäin on pelattu (viimeisin leima tänään tai eilen)
+    function perakkaisetPaivat() {
+        if (!leimat.length) return 0;
+        const paivat = [...new Set(leimat.map(l => l.pvm))].sort();
+        const viimeisin = paivat[paivat.length - 1];
+        if (paivaEro(tanaanPvm(), viimeisin) > 1) return 0; // putki katkesi
+        let määrä = 1;
+        for (let i = paivat.length - 1; i > 0; i--) {
+            if (paivaEro(paivat[i], paivat[i - 1]) === 1) määrä++;
+            else break;
+        }
+        return määrä;
+    }
+
+    let ilmoitusAjastin = null;
+    function naytaIlmoitus(teksti) {
+        const el = document.getElementById("ilmoitus");
+        el.innerText = teksti;
+        el.hidden = false;
+        // käynnistetään animaatio uudelleen
+        el.style.animation = "none";
+        void el.offsetWidth;
+        el.style.animation = "";
+        clearTimeout(ilmoitusAjastin);
+        ilmoitusAjastin = setTimeout(() => { el.hidden = true; }, 3500);
+    }
+
+    function annaLeima() {
+        const p = tanaanPvm();
+        if (leimat.some(l => l.pvm === p)) return false;
+        const kuva = leimaKuvat[leimat.length % leimaKuvat.length];
+        leimat.push({ pvm: p, kuva });
+        uusinLeima = p;
+        // joka viidennestä leimasta (5., 10., 15. ...) saa bonuskaloja: yhtä monta kuin leimoja on
+        const bonus = leimat.length % LEIMA_BONUSVALI === 0;
+        const bonusKalat = bonus ? leimat.length : 0;
+        kalat += bonusKalat;
+        paivitaKalat();
+        tallenna();
+        naytaIlmoitus(bonus
+            ? `📘 Uusi leima! ${kuva} Bonus: +${bonusKalat} 🐟`
+            : `📘 Uusi leima passiin! ${kuva}`);
+        konfetti();
+        return true;
+    }
+
+    function piirraPassi() {
+        const perakkain = perakkaisetPaivat();
+        document.getElementById("passi-tiedot").innerText =
+            `Leimoja: ${leimat.length} 🐾 Peräkkäisiä päiviä: ${perakkain}`;
+        const alue = document.getElementById("passi-ruudukko");
+        alue.innerHTML = "";
+        const paikkoja = Math.max(20, Math.ceil((leimat.length + 1) / 5) * 5); // aina vähintään 4 riviä
+        for (let i = 0; i < paikkoja; i++) {
+            const el = document.createElement("div");
+            const l = leimat[i];
+            if (l) {
+                el.className = "leima" + (l.pvm === uusinLeima ? " uusi" : "");
+                el.style.setProperty("--v", leimaVarit[i % leimaVarit.length]);
+                el.style.setProperty("--k", ((i * 37) % 21 - 10) + "deg"); // jokainen leima vähän vinossa
+                const kuva = document.createElement("span");
+                kuva.innerText = l.kuva;
+                const pvm = document.createElement("small");
+                const [, kk, pv] = l.pvm.split("-");
+                pvm.innerText = `${Number(pv)}.${Number(kk)}.`;
+                el.append(kuva, pvm);
+            } else if ((i + 1) % LEIMA_BONUSVALI === 0) {
+                // bonuspaikka: täältä saa kaloja
+                el.className = "leima tyhja bonus";
+                const kala = document.createElement("span");
+                kala.innerText = "🐟";
+                const maara = document.createElement("small");
+                maara.innerText = `+${i + 1}`; // 5. leimasta 5 kalaa, 10. leimasta 10 kalaa jne.
+                el.append(kala, maara);
+            } else {
+                el.className = "leima tyhja";
+                el.innerText = String(i + 1);
+            }
+            alue.appendChild(el);
+        }
+    }
+
+    function avaaPassi() {
+        piirraPassi();
+        document.getElementById("passi").hidden = false;
+        uusinLeima = null; // animaatio näytetään vain kerran
+    }
+
+    function suljePassi() {
+        document.getElementById("passi").hidden = true;
+        document.getElementById("vastaus").focus();
+    }
+
     // ---------- Oman kissan valinta ----------
     // Kissan väri tehdään suodattimella, joten kaikki ilmeet (😺 😻 🦁 🐯) toimivat jokaisella värillä.
     const kissaVarit = [
@@ -1598,9 +1821,13 @@
         if (vahtiVaihe === 0 || vahtiLapi) return;
         const syote = document.getElementById("vahti-syote");
         const viesti = document.getElementById("vahti-viesti");
-        const vastaus = parseInt(syote.value);
-        if (isNaN(vastaus)) {
-            viesti.innerText = "Kirjoita ensin numero! 🐱";
+        const luettu = lueKokonaisluku(syote.value);
+        const vastaus = luettu.arvo;
+        if (luettu.tila !== "ok") {
+            viesti.innerText = luettu.tila === "desimaali"
+                ? "Kirjoita vain numeroita, ilman pilkkua! 🐱"
+                : "Kirjoita ensin numero! 🐱";
+            syote.value = "";
             syote.focus();
             return;
         }
