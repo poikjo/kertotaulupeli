@@ -5,7 +5,7 @@
     <style>
         body {
             font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
-            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            background: linear-gradient(135deg, #ffd9b3, #d9b8ff);
             color: #333;
             text-align: center;
             margin: 0;
@@ -13,7 +13,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden; /* sivu ei scrollaa, peli skaalataan näytölle */
             box-sizing: border-box;
         }
         .peli-laatikko {
@@ -23,18 +25,64 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
             max-width: 550px;
             width: 100%;
-            border: 8px solid #ffd166;
+            border: 8px solid #ff9f68;
         }
         h1 {
-            color: #ef476f;
-            font-size: 2.5em;
+            color: #e8590c;
+            font-size: 2.3em;
             margin-top: 0;
-            text-shadow: 2px 2px #ffe66d;
+            text-shadow: 2px 2px #ffe0c2;
+        }
+        .peli-laatikko { position: relative; z-index: 1; }
+        .tausta-kissat {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .tausta-kissa {
+            position: absolute;
+            bottom: -80px;
+            opacity: 0.45;
+            animation: nouse linear infinite;
+            user-select: none;
+        }
+        @keyframes nouse {
+            0% { transform: translateY(0) rotate(-15deg); }
+            50% { transform: translateY(-55vh) rotate(15deg); }
+            100% { transform: translateY(-120vh) rotate(-15deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .tausta-kissa { animation: none; bottom: auto; }
+        }
+        .kissa-iso {
+            font-size: 4.5em;
+            line-height: 1;
+            margin: -10px 0 10px 0;
+            display: inline-block;
+            user-select: none;
+        }
+        .kissa-hyppy {
+            animation: hyppy 0.6s ease;
+        }
+        .kissa-tutisee {
+            animation: tutise 0.4s ease;
+        }
+        @keyframes hyppy {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            30% { transform: translateY(-25px) rotate(-10deg); }
+            60% { transform: translateY(0) rotate(10deg); }
+        }
+        @keyframes tutise {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
         .pisteet-laatikko {
             display: flex;
             justify-content: space-around;
-            background-color: #f8f9fa;
+            background-color: #fff1e6;
             padding: 15px;
             border-radius: 20px;
             margin-bottom: 20px;
@@ -44,23 +92,22 @@
         }
         .valinta-alue {
             margin-bottom: 20px;
-            background-color: #e0fbfc;
+            background-color: #f1e6ff;
             padding: 15px;
             border-radius: 20px;
         }
         .valinta-alue p {
             margin: 0 0 10px 0;
             font-weight: bold;
-            color: #118ab2;
+            color: #7b3fc4;
         }
         .taulu-napit {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 2 siistiä riviä: 1-5 ja 6-10 */
             gap: 8px;
         }
         .taulu-nappi {
-            background-color: #ffd166;
+            background-color: #ffc59a;
             border: none;
             border-radius: 12px;
             padding: 8px 14px;
@@ -71,36 +118,37 @@
             font-family: inherit;
         }
         .taulu-nappi.aktiivinen {
-            background-color: #06d6a0;
+            background-color: #e8590c;
             color: white;
             transform: scale(1.1);
         }
         .lasku-alue {
+            white-space: nowrap; /* lasku pysyy aina yhdellä rivillä */
             font-size: 4em;
             font-weight: bold;
             color: #073b4c;
             margin: 20px 0;
-            background-color: #fff3b0;
+            background-color: #fff3e0;
             padding: 20px;
             border-radius: 25px;
-            border: 4px dashed #ffd166;
+            border: 4px dashed #ff9f68;
         }
         .vastaus-syote {
             font-size: 2.5em;
             width: 140px;
             text-align: center;
             padding: 10px;
-            border: 4px solid #118ab2;
+            border: 4px solid #9b5de5;
             border-radius: 20px;
             font-family: inherit;
             margin-bottom: 20px;
             outline: none;
         }
         .vastaus-syote:focus {
-            border-color: #ef476f;
+            border-color: #e8590c;
         }
         .tarkista-nappi {
-            background-color: #06d6a0;
+            background-color: #ff8c42;
             color: white;
             border: none;
             border-radius: 25px;
@@ -108,7 +156,7 @@
             font-size: 1.8em;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 6px 0 #049a73;
+            box-shadow: 0 6px 0 #c9631f;
             transition: all 0.1s;
             font-family: inherit;
             display: block;
@@ -116,7 +164,7 @@
         }
         .tarkista-nappi:active {
             transform: translateY(6px);
-            box-shadow: 0 0 0 #049a73;
+            box-shadow: 0 0 0 #c9631f;
         }
         .palaute {
             font-size: 1.6em;
@@ -127,33 +175,51 @@
             align-items: center;
             justify-content: center;
         }
-        .oikein { color: #06d6a0; }
-        .vaarin { color: #ef476f; }
+        .oikein { color: #2a9d8f; }
+        .vaarin { color: #d62839; }
         .palkinto-alue {
             font-size: 2em;
             margin-top: 15px;
             min-height: 45px;
         }
+        /* Puhelin ja muut kapeat näytöt */
+        @media (max-width: 520px) {
+            body { padding: 8px; }
+            .peli-laatikko { padding: 14px; border-width: 5px; border-radius: 22px; }
+            h1 { font-size: 1.15em; margin-bottom: 4px; white-space: nowrap; }
+            .kissa-iso { font-size: 3em; margin: 0 0 6px 0; }
+            .pisteet-laatikko { padding: 8px; margin-bottom: 12px; font-size: 1.1em; }
+            .valinta-alue { padding: 10px; margin-bottom: 12px; }
+            .valinta-alue p { font-size: 0.9em; }
+            .taulu-nappi { padding: 8px 0; font-size: 1.1em; }
+            .lasku-alue { font-size: 9.5vw; padding: 12px 6px; margin: 12px 0; }
+            .vastaus-syote { font-size: 2em; width: 110px; margin-bottom: 12px; }
+            .tarkista-nappi { font-size: 1.5em; padding: 12px 32px; }
+            .palaute { font-size: 1.2em; margin-top: 12px; min-height: 36px; }
+            .palkinto-alue { font-size: 1.5em; margin-top: 8px; min-height: 36px; }
+        }
     </style></head><body>
+<div class="tausta-kissat" id="tausta-kissat" aria-hidden="true"></div>
 <div class="peli-laatikko">
-    <h1> Kertotaulupeli!</h1>
+    <h1>🐾 Kissojen kertotaulupeli! 🐾</h1>
+    <div class="kissa-iso" id="kissa-iso">😺</div>
         <div class="pisteet-laatikko">
-        <div> Pisteet: <span id="pisteet">0</span></div>
-        <div> Putki: <span id="putki">0</span></div>
+        <div>🐟 Kalat: <span id="pisteet">0</span></div>
+        <div>🐾 Putki: <span id="putki">0</span></div>
     </div>
 
     <div class="valinta-alue">
-        <p>Valitse kertotaulut (klikkaa päälle/pois):</p>
+        <p>🐾 Valitse kertotaulut (klikkaa päälle/pois):</p>
         <div class="taulu-napit" id="taulu-napit"></div>
     </div>
 
     <div class="lasku-alue" id="lasku">2 × 5 = ?</div>
 
     <input type="number" id="vastaus" class="vastaus-syote" placeholder="?" autocomplete="off">
-    <button class="tarkista-nappi" onclick="tarkistaVastaus()">Tarkista! </button>
+    <button class="tarkista-nappi" onclick="tarkistaVastaus()">Tarkista! 🐾</button>
 
     <div class="palaute" id="palaute"></div>
-    <div class="palkinto-alue" id="palkinnot" title="Ansaitut mitalit"></div></div>
+    <div class="palkinto-alue" id="palkinnot" title="Kerätyt kissat"></div></div>
 <script>
     let pisteet = 0;
     let putki = 0;
@@ -163,15 +229,17 @@
     let valitutTaulut = [2, 5, 10];
 
     const kannustukset = [
-        "Mahtavaa! ",
-        "Superhienoa! ",
-        "Olet matematiikkavelho! ",
-        "Täysosuma! ",
-        "Upeaa työtä! ",
-        "Jatka samaan malliin! "
+        "Mahtavaa!",
+        "Superhienoa!",
+        "Olet kissavelho!",
+        "Täysosuma, kissa kehrää!",
+        "Upeaa työtä!",
+        "Kissa sai kalan!",
+        "Jatka samaan malliin!"
     ];
 
-    const palkintoEmojit = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
+    const palkintoEmojit = ["🐱", "😺", "😸", "😻", "🐈", "🐈‍⬛", "😽", "🐯", "🦁"];
+    const kissaReaktiot = ["🐱", "😺", "😸", "😻", "🐈", "😽"];
 
     // Luodaan valintanapit kertotauluille 1-10
     const napitAlue = document.getElementById("taulu-napit");
@@ -220,7 +288,7 @@
         const oikeaVastaus = luku1 * luku2;
 
         if (isNaN(kayttajanVastaus)) {
-            palauteEl.innerText = "Kirjoita ensin numero laatikkoon! ";
+            palauteEl.innerText = "🐱 Kirjoita ensin numero laatikkoon!";
             palauteEl.className = "palaute vaarin";
             syote.focus();
             return;
@@ -233,7 +301,22 @@
             document.getElementById("putki").innerText = putki;
 
             const satunnainenKehuminen = kannustukset[Math.floor(Math.random() * kannustukset.length)];
-            palauteEl.innerText = satunnainenKehuminen;
+            // Mitä pidempi putki, sitä innostuneempi kissa!
+            let kissa;
+            if (putki > 20) {
+                kissa = "🐯";
+            } else if (putki >= 10) {
+                kissa = "🦁";
+            } else if (putki >= 5) {
+                kissa = "😻";
+            } else if (putki >= 3) {
+                kissa = "😺";
+            } else {
+                kissa = kissaReaktiot[Math.floor(Math.random() * kissaReaktiot.length)];
+            }
+            palauteEl.innerText = satunnainenKehuminen + " " + kissa + " Miau!";
+            animoiKissa(kissa, "kissa-hyppy");
+            miau(putki < 10); // pieni pentu miukuu, leijona ja tiikeri möristävät
             palauteEl.className = "palaute oikein";
 
             // Annetaan palkinto joka 5. oikeasta vastauksesta
@@ -246,11 +329,119 @@
         } else {
             putki = 0;
             document.getElementById("putki").innerText = putki;
-            palauteEl.innerText = `Hups! Yritä uudelleen! (Vinkki: ei ollut ${kayttajanVastaus}) `;
+            palauteEl.innerText = `🙀 Hups! Yritä uudelleen! (Vinkki: ei ollut ${kayttajanVastaus}) `;
             palauteEl.className = "palaute vaarin";
+            animoiKissa("🙀", "kissa-tutisee");
             syote.value = "";
             syote.focus();
         }
+    }
+
+    // Kissan "miau"-ääni tehdään selaimen omalla äänentekijällä (ei tarvita äänitiedostoa)
+    let aani = null;
+    // pieni = true: pieni kissanpentu (korkea, lyhyt, pehmeä)
+    // pieni = false: iso kissa (matala, pitkä, möreä)
+    // Jos kansiossa on oikea äänitys nimeltä miau.mp3, käytetään sitä.
+    // Muuten käytetään koneella tehtyä miau-ääntä.
+    let oikeaMiau = null;
+    let oikeaMiauValmis = false;
+    try {
+        oikeaMiau = new Audio("miau.mp3");
+        oikeaMiau.preload = "auto";
+        oikeaMiau.addEventListener("canplaythrough", () => { oikeaMiauValmis = true; });
+        oikeaMiau.addEventListener("error", () => { oikeaMiauValmis = false; });
+    } catch (e) { /* ei haittaa */ }
+
+    function miau(pieni = true) {
+        if (oikeaMiauValmis) {
+            try {
+                const a = oikeaMiau.cloneNode();
+                a.preservesPitch = false;
+                a.playbackRate = pieni ? 1.3 : 0.8; // pieni pentu korkeammalla, iso kissa matalammalla
+                a.play().catch(() => miauKoneella(pieni));
+                return;
+            } catch (e) { /* kokeillaan koneen ääntä */ }
+        }
+        miauKoneella(pieni);
+    }
+
+    function miauKoneella(pieni) {
+        try {
+            if (!aani) aani = new (window.AudioContext || window.webkitAudioContext)();
+            if (aani.state === "suspended") aani.resume();
+            const nyt = aani.currentTime;
+            const kesto = pieni ? 0.5 : 0.9;
+            const s = kesto / 0.9;            // ajan kerroin
+            const p = pieni ? 2.6 : 1;        // äänen korkeus
+            const v = pieni ? 1.35 : 1;       // vokaalien korkeus
+            const moryVoima = pieni ? 0.06 : 0.35;
+            const kovuus = pieni ? 0.3 : 0.4;
+
+            // Äänen lähde
+            const osc = aani.createOscillator();
+            osc.type = pieni ? "triangle" : "sawtooth";
+            // "mi-au": nousee ylös ja laskee alas
+            osc.frequency.setValueAtTime(190 * p, nyt);
+            osc.frequency.linearRampToValueAtTime(260 * p, nyt + 0.1 * s);
+            osc.frequency.linearRampToValueAtTime(430 * p, nyt + 0.3 * s);
+            osc.frequency.linearRampToValueAtTime(380 * p, nyt + 0.55 * s);
+            osc.frequency.linearRampToValueAtTime(210 * p, nyt + kesto);
+
+            // Möry: nopea värinä äänen voimakkuudessa
+            const mory = aani.createOscillator();
+            const moryMaara = aani.createGain();
+            mory.frequency.value = 32;
+            moryMaara.gain.value = moryVoima;
+            mory.connect(moryMaara);
+
+            const voimakkuus = aani.createGain();
+            voimakkuus.gain.setValueAtTime(0.0001, nyt);
+            voimakkuus.gain.exponentialRampToValueAtTime(kovuus, nyt + 0.08 * s);
+            voimakkuus.gain.setValueAtTime(kovuus, nyt + 0.5 * s);
+            voimakkuus.gain.exponentialRampToValueAtTime(0.0001, nyt + kesto);
+            moryMaara.connect(voimakkuus.gain);
+
+            // Kaksi suodatinta tekevät vokaalit: "i" -> "a" -> "u" (mi-au)
+            const f1 = aani.createBiquadFilter();
+            f1.type = "bandpass";
+            f1.Q.value = 5;
+            f1.frequency.setValueAtTime(320 * v, nyt);
+            f1.frequency.linearRampToValueAtTime(850 * v, nyt + 0.35 * s);
+            f1.frequency.linearRampToValueAtTime(380 * v, nyt + kesto);
+
+            const f2 = aani.createBiquadFilter();
+            f2.type = "bandpass";
+            f2.Q.value = 5;
+            f2.frequency.setValueAtTime(2300 * v, nyt);
+            f2.frequency.linearRampToValueAtTime(1300 * v, nyt + 0.35 * s);
+            f2.frequency.linearRampToValueAtTime(750 * v, nyt + kesto);
+
+            const f2Taso = aani.createGain();
+            f2Taso.gain.value = 0.6;
+
+            osc.connect(f1);
+            osc.connect(f2);
+            f1.connect(voimakkuus);
+            f2.connect(f2Taso);
+            f2Taso.connect(voimakkuus);
+            voimakkuus.connect(aani.destination);
+
+            osc.start(nyt);
+            mory.start(nyt);
+            osc.stop(nyt + kesto + 0.05);
+            mory.stop(nyt + kesto + 0.05);
+        } catch (e) {
+            // Jos ääni ei toimi, peli toimii silti ilman sitä
+        }
+    }
+
+    // Iso kissa reagoi vastauksiin
+    function animoiKissa(emoji, luokka) {
+        const el = document.getElementById("kissa-iso");
+        el.innerText = emoji;
+        el.classList.remove("kissa-hyppy", "kissa-tutisee");
+        void el.offsetWidth; // käynnistää animaation uudelleen
+        el.classList.add(luokka);
     }
 
     // Mahdollistetaan vastaaminen myös painamalla Enter-näppäintä
@@ -260,6 +451,42 @@
             tarkistaVastaus();
         }
     });
+
+    // Taustalla leijuvat kissat
+    (function luoTaustaKissat() {
+        const alue = document.getElementById("tausta-kissat");
+        const kissat = ["🐱", "😺", "😸", "😻", "🐈", "🐈‍⬛", "😽", "🐾"];
+        for (let i = 0; i < 16; i++) {
+            const el = document.createElement("span");
+            el.className = "tausta-kissa";
+            el.innerText = kissat[i % kissat.length];
+            el.style.left = (3 + (i * 6.1) % 92) + "%";
+            el.style.fontSize = (32 + Math.random() * 40) + "px";
+            el.style.animationDuration = (14 + Math.random() * 14) + "s";
+            el.style.animationDelay = (-Math.random() * 28) + "s";
+            alue.appendChild(el);
+        }
+    })();
+
+    // Skaalataan peli niin, että se mahtuu aina kokonaan yhdelle näytölle
+    function skaalaaPeli() {
+        const laatikko = document.querySelector(".peli-laatikko");
+        const tila = 24; // tyhjää reunoille
+        const leveys = laatikko.offsetWidth;
+        const korkeus = laatikko.offsetHeight;
+        const skaala = Math.min(
+            (window.innerWidth - tila) / leveys,
+            (window.innerHeight - tila) / korkeus,
+            1.6 // isolla näytöllä saa kasvaa vähän
+        );
+        laatikko.style.transform = `scale(${skaala})`;
+    }
+    window.addEventListener("resize", skaalaaPeli);
+    if (window.ResizeObserver) {
+        // skaalataan uudelleen, kun sisältö muuttuu (esim. uusia mitaleja)
+        new ResizeObserver(skaalaaPeli).observe(document.querySelector(".peli-laatikko"));
+    }
+    skaalaaPeli();
 
     // Käynnistetään peli ensimmäisellä laskulla
     uusiLasku();
