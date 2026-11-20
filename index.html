@@ -2,10 +2,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kertotauluseikkailu!</title>
+    <!-- Favicon: oranssi kissa ja violetti kertomerkki (×). SVG on suoraan tässä, joten erillistä tiedostoa ei tarvita. -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='8,26 10,4 26,16' fill='%23ff9f68'/%3E%3Cpolygon points='56,26 54,4 38,16' fill='%23ff9f68'/%3E%3Ccircle cx='32' cy='36' r='24' fill='%23ff9f68'/%3E%3Ccircle cx='23' cy='32' r='4' fill='%23073b4c'/%3E%3Ccircle cx='41' cy='32' r='4' fill='%23073b4c'/%3E%3Cpolygon points='28,41 36,41 32,46' fill='%23ef476f'/%3E%3Ccircle cx='50' cy='50' r='13' fill='%237b3fc4'/%3E%3Cpath d='M44 44 L56 56 M56 44 L44 56' stroke='white' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E">
     <style>
+        :root {
+            --tausta1: #ffd9b3; --tausta2: #d9b8ff; --reuna: #ff9f68; --aksentti: #e8590c;
+            --nappi: #ff8c42; --nappi-varjo: #c9631f; --taulu: #ffc59a; --paneeli1: #fff1e6;
+            --lasku: #fff3e0; --paneeli2: #f1e6ff; --paneeli2-teksti: #7b3fc4;
+            --toissijainen: #9b5de5; --otsikko-varjo: #ffe0c2;
+        }
         body {
             font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
-            background: linear-gradient(135deg, #ffd9b3, #d9b8ff);
+            background: linear-gradient(135deg, var(--tausta1), var(--tausta2));
             color: #333;
             text-align: center;
             margin: 0;
@@ -25,13 +33,13 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.2);
             max-width: 550px;
             width: 100%;
-            border: 8px solid #ff9f68;
+            border: 8px solid var(--reuna);
         }
         h1 {
-            color: #e8590c;
+            color: var(--aksentti);
             font-size: 2.3em;
             margin-top: 0;
-            text-shadow: 2px 2px #ffe0c2;
+            text-shadow: 2px 2px var(--otsikko-varjo);
         }
         .peli-laatikko { position: relative; z-index: 1; }
         .tausta-kissat {
@@ -82,7 +90,7 @@
         .pisteet-laatikko {
             display: flex;
             justify-content: space-around;
-            background-color: #fff1e6;
+            background-color: var(--paneeli1);
             padding: 15px;
             border-radius: 20px;
             margin-bottom: 20px;
@@ -92,14 +100,14 @@
         }
         .valinta-alue {
             margin-bottom: 20px;
-            background-color: #f1e6ff;
+            background-color: var(--paneeli2);
             padding: 15px;
             border-radius: 20px;
         }
         .valinta-alue p {
             margin: 0 0 10px 0;
             font-weight: bold;
-            color: #7b3fc4;
+            color: var(--paneeli2-teksti);
         }
         .taulu-napit {
             display: grid;
@@ -107,7 +115,7 @@
             gap: 8px;
         }
         .taulu-nappi {
-            background-color: #ffc59a;
+            background-color: var(--taulu);
             border: none;
             border-radius: 12px;
             padding: 8px 14px;
@@ -118,7 +126,7 @@
             font-family: inherit;
         }
         .taulu-nappi.aktiivinen {
-            background-color: #e8590c;
+            background-color: var(--aksentti);
             color: white;
             transform: scale(1.1);
         }
@@ -128,27 +136,27 @@
             font-weight: bold;
             color: #073b4c;
             margin: 20px 0;
-            background-color: #fff3e0;
+            background-color: var(--lasku);
             padding: 20px;
             border-radius: 25px;
-            border: 4px dashed #ff9f68;
+            border: 4px dashed var(--reuna);
         }
         .vastaus-syote {
             font-size: 2.5em;
             width: 140px;
             text-align: center;
             padding: 10px;
-            border: 4px solid #9b5de5;
+            border: 4px solid var(--toissijainen);
             border-radius: 20px;
             font-family: inherit;
             margin-bottom: 20px;
             outline: none;
         }
         .vastaus-syote:focus {
-            border-color: #e8590c;
+            border-color: var(--aksentti);
         }
         .tarkista-nappi {
-            background-color: #ff8c42;
+            background-color: var(--nappi);
             color: white;
             border: none;
             border-radius: 25px;
@@ -156,7 +164,7 @@
             font-size: 1.8em;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 6px 0 #c9631f;
+            box-shadow: 0 6px 0 var(--nappi-varjo);
             transition: all 0.1s;
             font-family: inherit;
             display: block;
@@ -164,7 +172,7 @@
         }
         .tarkista-nappi:active {
             transform: translateY(6px);
-            box-shadow: 0 0 0 #c9631f;
+            box-shadow: 0 0 0 var(--nappi-varjo);
         }
         .palaute {
             font-size: 1.6em;
@@ -188,14 +196,14 @@
             border: none;
             border-radius: 14px;
             padding: 8px 14px;
-            background: #f1e6ff;
-            color: #7b3fc4;
+            background: var(--paneeli2);
+            color: var(--paneeli2-teksti);
             font-weight: bold;
             font-family: inherit;
             font-size: 1em;
             cursor: pointer;
         }
-        .valilehti.valittu { background: #9b5de5; color: white; }
+        .valilehti.valittu { background: var(--toissijainen); color: white; }
 
         /* Pikanapit (kauppa ja koti) */
         .pisteet-laatikko { flex-wrap: wrap; row-gap: 8px; }
@@ -233,6 +241,33 @@
         .sisustus.leikkikalu { pointer-events: auto; cursor: pointer; }
 
         .kauppa-nappi.alusta-nappi { background-color: #868e96; }
+        .pikanapit { flex-wrap: wrap; }
+
+        /* Teemavalikko */
+        .teema-laatikko { max-width: 92%; }
+        .teema-ruudukko {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .teema-kortti {
+            border: 3px solid transparent;
+            border-radius: 14px;
+            padding: 8px 6px;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 1em;
+            color: #073b4c;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .teema-kortti.valittu { border-color: #073b4c; }
+        .teema-kortti .teema-emoji { font-size: 1.6em; line-height: 1; }
+        .teema-varit { display: flex; gap: 4px; }
+        .teema-varit i { width: 16px; height: 16px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,0.2); }
 
         /* Kissojen nimet */
         .nimilappu {
@@ -265,20 +300,20 @@
         .nimi-ikkuna[hidden] { display: none; }
         .nimi-laatikko {
             background: white;
-            border: 3px solid #9b5de5;
+            border: 3px solid var(--toissijainen);
             border-radius: 20px;
             padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             font-weight: bold;
-            color: #7b3fc4;
+            color: var(--paneeli2-teksti);
             font-size: 1.1em;
         }
         #nimi-syote {
             font-size: 1.3em;
             text-align: center;
-            border: 3px solid #9b5de5;
+            border: 3px solid var(--toissijainen);
             border-radius: 14px;
             padding: 8px;
             font-family: inherit;
@@ -287,6 +322,20 @@
             outline: none;
         }
         .nimi-napit { display: flex; gap: 10px; justify-content: center; }
+        .vahti { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .vahti[hidden], #kissa-valinta[hidden] { display: none; }
+        .vahti-tehtava { font-size: 2em; color: #073b4c; }
+        .vahti-viesti { min-height: 1.4em; font-size: 0.9em; color: #073b4c; }
+        #vahti-syote {
+            font-size: 1.5em;
+            text-align: center;
+            border: 3px solid var(--toissijainen);
+            border-radius: 14px;
+            padding: 6px;
+            font-family: inherit;
+            width: 110px;
+            outline: none;
+        }
         .nimi-napit .kauppa-nappi { font-size: 1em; padding: 8px 14px; }
 
         /* Yö kissakodissa */
@@ -326,7 +375,7 @@
             font-size: 0.4em;
             line-height: 1.2;
             background: white;
-            border: 2px solid #9b5de5;
+            border: 2px solid var(--toissijainen);
             border-radius: 14px;
             padding: 2px 8px;
             white-space: nowrap;
@@ -356,6 +405,30 @@
             .konfetti-alue { display: none; }
         }
 
+        /* Kuvalaskut */
+        .tila-valinta { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
+        .tila-valinta .valilehti { padding: 6px 12px; font-size: 0.95em; }
+        .lasku-alue.kuvalasku {
+            font-size: 1em;
+            white-space: normal;
+            padding: 12px;
+            margin: 14px 0;
+        }
+        .kuva-teksti { font-size: 1.15rem; line-height: 1.3; margin-bottom: 10px; }
+        .kuva-ryhmat { display: grid; gap: 6px; }
+        .kuva-ryhma {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            gap: 1px;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px dashed var(--reuna);
+            border-radius: 12px;
+            line-height: 1.1;
+        }
+
         /* Kissan tavarat */
         .kissa-iso { position: relative; }
         .kissa-hattu, .kissa-lasit {
@@ -368,10 +441,14 @@
         }
         .kissa-hattu { top: -0.28em; }
         .kissa-lasit { top: 0.42em; }
+        /* Koko kissa (🐈 🐆 🐅): tavarat näytetään kissan yläpuolella, koska pää on eri kohdassa */
+        .kissa-iso.vartalo { margin-top: 8px; }
+        .kissa-iso.vartalo .kissa-hattu, .koti-kissa.vartalo .kissa-hattu { top: -0.5em; left: 30%; }
+        .kissa-iso.vartalo .kissa-lasit, .koti-kissa.vartalo .kissa-lasit { top: -0.5em; left: 70%; }
 
         /* Kalakauppa */
         .kauppa-nappi {
-            background-color: #9b5de5;
+            background-color: var(--toissijainen);
             color: white;
             border: none;
             border-radius: 14px;
@@ -395,15 +472,15 @@
             gap: 10px;
         }
         .kauppa[hidden] { display: none; }
-        .kauppa h2 { margin: 0; color: #7b3fc4; font-size: 1.6em; }
-        .kauppa-kalat { font-size: 1.3em; font-weight: bold; color: #073b4c; background: #fff1e6; border-radius: 16px; padding: 8px; }
+        .kauppa h2 { margin: 0; color: var(--paneeli2-teksti); font-size: 1.6em; }
+        .kauppa-kalat { font-size: 1.3em; font-weight: bold; color: #073b4c; background: var(--paneeli1); border-radius: 16px; padding: 8px; }
         .tavara-ruudukko {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
         .tavara {
-            background: #f1e6ff;
+            background: var(--paneeli2);
             border: 3px solid transparent;
             border-radius: 16px;
             padding: 8px 4px;
@@ -420,7 +497,7 @@
         .tavara .tavara-hinta { font-size: 0.9em; }
         .tavara.omistettu { background: #e6f7f0; }
         .tavara.paalla { border-color: #2a9d8f; background: #d4f5e9; }
-        .kauppa-viesti { min-height: 1.5em; font-weight: bold; color: #7b3fc4; }
+        .kauppa-viesti { min-height: 1.5em; font-weight: bold; color: var(--paneeli2-teksti); }
         .kauppa-sulje { font-size: 1.4em; padding: 10px 30px; margin-top: auto; }
 
         /* Puhelin ja muut kapeat näytöt */
@@ -459,11 +536,17 @@
         <div class="pikanapit">
             <button class="kauppa-nappi" onclick="avaaKauppa()">🛒 Kauppa</button>
             <button class="kauppa-nappi" onclick="avaaKoti()">🏠 Koti</button>
+            <button class="kauppa-nappi" onclick="avaaKissaValikko()">🐱 Kissa</button>
+            <button class="kauppa-nappi" onclick="avaaTeemaValikko()">🎨 Teema</button>
             <button class="kauppa-nappi alusta-nappi" onclick="avaaAlustaKysymys()">🔄 Alusta</button>
         </div>
     </div>
 
     <div class="valinta-alue">
+        <div class="tila-valinta">
+            <button class="valilehti valittu" id="tila-numerot" onclick="asetaTila('numerot')">🔢 Numerot</button>
+            <button class="valilehti" id="tila-kuvat" onclick="asetaTila('kuvat')">🐟 Kuvalaskut</button>
+        </div>
         <p>🐾 Valitse kertotaulut (klikkaa päälle/pois):</p>
         <div class="taulu-napit" id="taulu-napit"></div>
     </div>
@@ -475,6 +558,41 @@
 
     <div class="palaute" id="palaute"></div>
     <div class="palkinto-alue" id="palkinnot" title="Kerätyt kissat"></div>
+
+    <div class="nimi-ikkuna" id="kissa-ikkuna" hidden style="z-index: 9">
+        <div class="nimi-laatikko teema-laatikko">
+            <div>🐱 Valitse oma kissasi</div>
+
+            <!-- Vahti: kissan valinta onnistuu vasta, kun on ratkaissut yhteen- ja kertolaskun -->
+            <div id="kissa-vahti" class="vahti">
+                <div>🔒 Ratkaise ensin kaksi laskua!</div>
+                <div class="vahti-tehtava" id="vahti-tehtava"></div>
+                <input id="vahti-syote" type="number" inputmode="numeric" autocomplete="off" placeholder="?">
+                <button class="kauppa-nappi" onclick="tarkistaVahti()">Tarkista 🐾</button>
+                <div class="vahti-viesti" id="vahti-viesti"></div>
+            </div>
+
+            <div id="kissa-valinta" hidden>
+                <div style="font-size: 0.85em">Muoto</div>
+                <div class="teema-ruudukko" id="kissa-muodot" style="grid-template-columns: repeat(3, 1fr)"></div>
+                <div style="font-size: 0.85em; margin-top: 8px">Väri</div>
+                <div class="teema-ruudukko" id="kissa-ruudukko" style="grid-template-columns: repeat(3, 1fr)"></div>
+            </div>
+            <div class="nimi-napit">
+                <button class="kauppa-nappi" id="kissa-sulje" onclick="suljeKissaValikko()">Peruuta</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nimi-ikkuna" id="teema-ikkuna" hidden style="z-index: 9">
+        <div class="nimi-laatikko teema-laatikko">
+            <div>🎨 Valitse teema</div>
+            <div class="teema-ruudukko" id="teema-ruudukko"></div>
+            <div class="nimi-napit">
+                <button class="kauppa-nappi" onclick="suljeTeemaValikko()">Valmis ✅</button>
+            </div>
+        </div>
+    </div>
 
     <div class="nimi-ikkuna" id="alusta-ikkuna" hidden style="z-index: 9">
         <div class="nimi-laatikko">
@@ -529,6 +647,7 @@
 <script>
     let pisteet = 0;
     let putki = 0;
+    let tila = "numerot"; // "numerot" (esim. 3 × 4) tai "kuvat" (kuvalaskut)
     let luku1 = 2;
     let luku2 = 5;
     // Oletuksena valittuna helpot kertotaulut 2, 5 ja 10
@@ -576,15 +695,84 @@
         // Arvotaan kertoja 1-10 väliltä
         luku2 = Math.floor(Math.random() * 10) + 1;
         // Arvotaan välillä kummin päin luvut näytetään (esim. 2x5 tai 5x2)
-        if (Math.random() > 0.5) {
-            document.getElementById("lasku").innerText = `${luku1} × ${luku2} = ?`;
+        const vaihda = Math.random() > 0.5;
+        const a = vaihda ? luku2 : luku1;
+        const b = vaihda ? luku1 : luku2;
+        const laskuEl = document.getElementById("lasku");
+        laskuEl.classList.toggle("kuvalasku", tila === "kuvat");
+        if (tila === "kuvat") {
+            piirraKuvalasku(laskuEl, a, b);
         } else {
-            document.getElementById("lasku").innerText = `${luku2} × ${luku1} = ?`;
+            laskuEl.innerText = `${a} × ${b} = ?`;
         }
 
         const syote = document.getElementById("vastaus");
         syote.value = "";
         if (document.getElementById("kauppa").hidden) syote.focus();
+    }
+
+    // ---------- Kuvalaskut ----------
+    // Jokaisella esineellä ja säiliöllä on suomen kielen muodot: yks = yksikkö, mon = osanto (esim. "4 kalaa")
+    const kuvaEsineet = [
+        { e: "🐟", yks: "kala", mon: "kalaa" },
+        { e: "🐭", yks: "hiiri", mon: "hiirtä" },
+        { e: "🧶", yks: "lankakerä", mon: "lankakerää" },
+        { e: "❤️", yks: "sydän", mon: "sydäntä" },
+        { e: "🐾", yks: "tassunjälki", mon: "tassunjälkeä" },
+        { e: "⭐", yks: "tähti", mon: "tähteä" }
+    ];
+    const kuvaSailiot = [
+        { yks: "lautanen", mon: "lautasta", jokaisessa: "Jokaisella lautasella" },
+        { yks: "kori", mon: "koria", jokaisessa: "Jokaisessa korissa" },
+        { yks: "laatikko", mon: "laatikkoa", jokaisessa: "Jokaisessa laatikossa" },
+        { yks: "pussi", mon: "pussia", jokaisessa: "Jokaisessa pussissa" }
+    ];
+
+    function arvo(lista) {
+        return lista[Math.floor(Math.random() * lista.length)];
+    }
+
+    // "1 kala", "3 kalaa"
+    function maaraTeksti(n, o) {
+        return n === 1 ? `1 ${o.yks}` : `${n} ${o.mon}`;
+    }
+
+    // Piirtää tehtävän: a säiliötä, joissa jokaisessa on b esinettä
+    function piirraKuvalasku(el, a, b) {
+        const esine = arvo(kuvaEsineet);
+        const sailio = arvo(kuvaSailiot);
+        el.innerHTML = "";
+
+        const teksti = document.createElement("div");
+        teksti.className = "kuva-teksti";
+        teksti.innerText = `Kissalla on ${maaraTeksti(a, sailio)}. ${sailio.jokaisessa} on ${maaraTeksti(b, esine)}. ` +
+            `Montako ${esine.mon} on yhteensä?`;
+        el.appendChild(teksti);
+
+        const ryhmat = document.createElement("div");
+        ryhmat.className = "kuva-ryhmat";
+        ryhmat.style.gridTemplateColumns = `repeat(${Math.min(a, 5)}, 1fr)`;
+        const koko = b <= 4 ? "1.7em" : (b <= 6 ? "1.4em" : "1.15em"); // isommat kuvat kun niitä on vähän
+        for (let i = 0; i < a; i++) {
+            const ryhma = document.createElement("div");
+            ryhma.className = "kuva-ryhma";
+            ryhma.style.fontSize = koko;
+            ryhma.innerText = esine.e.repeat(b);
+            ryhmat.appendChild(ryhma);
+        }
+        el.appendChild(ryhmat);
+    }
+
+    function paivitaTilaNapit() {
+        document.getElementById("tila-numerot").classList.toggle("valittu", tila === "numerot");
+        document.getElementById("tila-kuvat").classList.toggle("valittu", tila === "kuvat");
+    }
+
+    function asetaTila(uusi) {
+        tila = uusi === "kuvat" ? "kuvat" : "numerot";
+        paivitaTilaNapit();
+        tallenna();
+        uusiLasku();
     }
 
     function tarkistaVastaus() {
@@ -610,18 +798,7 @@
 
             const satunnainenKehuminen = kannustukset[Math.floor(Math.random() * kannustukset.length)];
             // Mitä pidempi putki, sitä innostuneempi kissa!
-            let kissa;
-            if (putki > 20) {
-                kissa = "🐯";
-            } else if (putki >= 10) {
-                kissa = "🦁";
-            } else if (putki >= 5) {
-                kissa = "😻";
-            } else if (putki >= 3) {
-                kissa = "😺";
-            } else {
-                kissa = kissaReaktiot[Math.floor(Math.random() * kissaReaktiot.length)];
-            }
+            const kissa = ilmeKissalle(putki);
             palauteEl.innerText = satunnainenKehuminen + " " + kissa + " Miau!";
             animoiKissa(kissa, "kissa-hyppy");
             miau(putki < 10); // pieni pentu miukuu, leijona ja tiikeri möristävät
@@ -643,7 +820,7 @@
             document.getElementById("putki").innerText = putki;
             palauteEl.innerText = `🙀 Hups! Yritä uudelleen! (Vinkki: ei ollut ${kayttajanVastaus}) `;
             palauteEl.className = "palaute vaarin";
-            animoiKissa("🙀", "kissa-tutisee");
+            animoiKissa(haeMuoto(kissaMuoto).vaarin, "kissa-tutisee");
             syote.value = "";
             syote.focus();
         }
@@ -751,6 +928,7 @@
     function animoiKissa(emoji, luokka) {
         const el = document.getElementById("kissa-iso");
         document.getElementById("kissa-naama").innerText = emoji;
+        el.classList.toggle("vartalo", onVartalo(emoji)); // vartalokissan tavarat näytetään pään sijaan yläpuolella
         el.classList.remove("kissa-hyppy", "kissa-tutisee");
         void el.offsetWidth; // käynnistää animaation uudelleen
         el.classList.add(luokka);
@@ -764,21 +942,7 @@
         }
     });
 
-    // Taustalla leijuvat kissat
-    (function luoTaustaKissat() {
-        const alue = document.getElementById("tausta-kissat");
-        const kissat = ["🐱", "😺", "😸", "😻", "🐈", "🐈‍⬛", "😽", "🐾"];
-        for (let i = 0; i < 16; i++) {
-            const el = document.createElement("span");
-            el.className = "tausta-kissa";
-            el.innerText = kissat[i % kissat.length];
-            el.style.left = (3 + (i * 6.1) % 92) + "%";
-            el.style.fontSize = (32 + Math.random() * 40) + "px";
-            el.style.animationDuration = (14 + Math.random() * 14) + "s";
-            el.style.animationDelay = (-Math.random() * 28) + "s";
-            alue.appendChild(el);
-        }
-    })();
+    // (taustalla leijuvat kuvat luodaan teeman mukaan, ks. asetaTeema)
 
     // Skaalataan peli niin, että se mahtuu aina kokonaan yhdelle näytölle
     function skaalaaPeli() {
@@ -890,7 +1054,7 @@
     }
 
     function tallenna() {
-        kirjoitaTallennus(JSON.stringify({ kalat, omistetut, paalla, pisteet, kodinKissat, kalusteet, omaNimi, nimet: kissojenNimet }));
+        kirjoitaTallennus(JSON.stringify({ kalat, omistetut, paalla, pisteet, kodinKissat, kalusteet, omaNimi, nimet: kissojenNimet, teema, tila, kissaVari, kissaMuoto }));
     }
 
     function lataa() {
@@ -901,6 +1065,10 @@
             pisteet = Math.max(0, parseInt(d.pisteet) || 0);
             kalusteet = (Array.isArray(d.kalusteet) ? d.kalusteet : []).filter(id => haeKaluste(id));
             omaNimi = siivoaNimi(d.omaNimi) || "Mirri";
+            teema = haeTeema(d.teema).id;
+            tila = d.tila === "kuvat" ? "kuvat" : "numerot";
+            kissaVari = haeKissaVari(d.kissaVari).id;
+            kissaMuoto = haeMuoto(d.kissaMuoto).id;
             const raakaKissat = Array.isArray(d.kodinKissat) ? d.kodinKissat : [];
             const raakaNimet = Array.isArray(d.nimet) ? d.nimet : [];
             kodinKissat = [];
@@ -1094,10 +1262,11 @@
 
     function luoKotiKissa(naama, oma, nimi, avain) {
         const el = document.createElement("span");
-        el.className = "koti-kissa" + (oma ? " oma" : "");
+        el.className = "koti-kissa" + (oma ? " oma" : "") + (onVartalo(naama) ? " vartalo" : "");
         el.dataset.avain = String(avain); // "oma" tai kissan numero
         const k = document.createElement("span");
         k.innerText = naama;
+        if (oma) k.style.filter = haeKissaVari(kissaVari).filter; // oman kissan väri
         el.appendChild(k);
         if (oma) {
             // oma kissa pitää päällä ostetut tavarat
@@ -1185,6 +1354,299 @@
         });
     }
 
+    // ---------- Teemat ----------
+    // Teema vaihtaa värit ja taustalla leijuvat kuvat. Kissa pysyy aina pelin sankarina!
+    const teemat = [
+        { id: "kissa", nimi: "Kissa", emoji: "🐱",
+          kuvat: ["🐱", "😺", "😸", "😻", "🐈", "🐈‍⬛", "😽", "🐾"],
+          v: { tausta1: "#ffd9b3", tausta2: "#d9b8ff", reuna: "#ff9f68", aksentti: "#e8590c", nappi: "#ff8c42",
+               "nappi-varjo": "#c9631f", taulu: "#ffc59a", paneeli1: "#fff1e6", lasku: "#fff3e0", paneeli2: "#f1e6ff",
+               "paneeli2-teksti": "#7b3fc4", toissijainen: "#9b5de5", "otsikko-varjo": "#ffe0c2" } },
+        { id: "meri", nimi: "Meri", emoji: "🌊",
+          kuvat: ["🐠", "🐟", "🐬", "🐙", "🦀", "🐳", "🌊", "🐚"],
+          v: { tausta1: "#a8e6ff", tausta2: "#4facfe", reuna: "#4dabf7", aksentti: "#1c7ed6", nappi: "#339af0",
+               "nappi-varjo": "#1864ab", taulu: "#a5d8ff", paneeli1: "#e7f5ff", lasku: "#e7f5ff", paneeli2: "#d0ebff",
+               "paneeli2-teksti": "#1864ab", toissijainen: "#1c7ed6", "otsikko-varjo": "#d0ebff" } },
+        { id: "metsa", nimi: "Metsä", emoji: "🌲",
+          kuvat: ["🌲", "🍄", "🦊", "🐿️", "🦉", "🦔", "🍃", "🌳"],
+          v: { tausta1: "#d3f9d8", tausta2: "#69db7c", reuna: "#51cf66", aksentti: "#2b8a3e", nappi: "#40c057",
+               "nappi-varjo": "#2b8a3e", taulu: "#b2f2bb", paneeli1: "#ebfbee", lasku: "#f4fce3", paneeli2: "#e9fac8",
+               "paneeli2-teksti": "#2b8a3e", toissijainen: "#37b24d", "otsikko-varjo": "#d3f9d8" } },
+        { id: "karkki", nimi: "Karkki", emoji: "🍭",
+          kuvat: ["🍭", "🍬", "🧁", "🍩", "🍪", "🍓", "🍰", "🍫"],
+          v: { tausta1: "#ffc2e2", tausta2: "#c3b1ff", reuna: "#f06595", aksentti: "#d6336c", nappi: "#f06595",
+               "nappi-varjo": "#a61e4d", taulu: "#ffc9de", paneeli1: "#fff0f6", lasku: "#fff0f6", paneeli2: "#f3d9fa",
+               "paneeli2-teksti": "#9c36b5", toissijainen: "#cc5de8", "otsikko-varjo": "#ffdeeb" } },
+        { id: "avaruus", nimi: "Avaruus", emoji: "🚀",
+          kuvat: ["🚀", "⭐", "🪐", "🌙", "👽", "🛸", "☄️", "✨"],
+          v: { tausta1: "#2b2d6e", tausta2: "#7c5cd6", reuna: "#7950f2", aksentti: "#5f3dc4", nappi: "#7950f2",
+               "nappi-varjo": "#4c2fb0", taulu: "#d0bfff", paneeli1: "#f3f0ff", lasku: "#f3f0ff", paneeli2: "#e5dbff",
+               "paneeli2-teksti": "#5f3dc4", toissijainen: "#845ef7", "otsikko-varjo": "#d0bfff" } }
+    ];
+    let teema = "kissa";
+
+    function haeTeema(id) {
+        return teemat.find(t => t.id === id) || teemat[0];
+    }
+
+    // Taustalla leijuvat kuvat (teeman mukaan)
+    function luoTausta(kuvat) {
+        const alue = document.getElementById("tausta-kissat");
+        alue.innerHTML = "";
+        for (let i = 0; i < 16; i++) {
+            const el = document.createElement("span");
+            el.className = "tausta-kissa";
+            el.innerText = kuvat[i % kuvat.length];
+            el.style.left = (3 + (i * 6.1) % 92) + "%";
+            el.style.fontSize = (32 + Math.random() * 40) + "px";
+            el.style.animationDuration = (14 + Math.random() * 14) + "s";
+            el.style.animationDelay = (-Math.random() * 28) + "s";
+            alue.appendChild(el);
+        }
+    }
+
+    function asetaTeema(id, tallennaValinta) {
+        const t = haeTeema(id);
+        teema = t.id;
+        for (const [nimi, arvo] of Object.entries(t.v)) {
+            document.documentElement.style.setProperty("--" + nimi, arvo);
+        }
+        luoTausta(t.kuvat);
+        if (tallennaValinta) tallenna();
+        if (!document.getElementById("teema-ikkuna").hidden) piirraTeemat();
+    }
+
+    function piirraTeemat() {
+        const alue = document.getElementById("teema-ruudukko");
+        alue.innerHTML = "";
+        for (const t of teemat) {
+            const nappi = document.createElement("button");
+            nappi.className = "teema-kortti" + (t.id === teema ? " valittu" : "");
+            nappi.style.background = "linear-gradient(135deg, " + t.v.tausta1 + ", " + t.v.tausta2 + ")";
+            const e = document.createElement("span");
+            e.className = "teema-emoji";
+            e.innerText = t.emoji;
+            const n = document.createElement("span");
+            n.innerText = t.nimi;
+            nappi.append(e, n);
+            nappi.onclick = () => asetaTeema(t.id, true);
+            alue.appendChild(nappi);
+        }
+    }
+
+    function avaaTeemaValikko() {
+        piirraTeemat();
+        document.getElementById("teema-ikkuna").hidden = false;
+    }
+
+    function suljeTeemaValikko() {
+        document.getElementById("teema-ikkuna").hidden = true;
+        document.getElementById("vastaus").focus();
+    }
+
+    // ---------- Oman kissan valinta ----------
+    // Kissan väri tehdään suodattimella, joten kaikki ilmeet (😺 😻 🦁 🐯) toimivat jokaisella värillä.
+    const kissaVarit = [
+        { id: "oranssi", nimi: "Oranssi", filter: "" },
+        { id: "harmaa", nimi: "Harmaa", filter: "grayscale(1)" },
+        { id: "musta", nimi: "Musta", filter: "grayscale(1) brightness(0.35)" },
+        { id: "sininen", nimi: "Sininen", filter: "hue-rotate(170deg)" },
+        { id: "pinkki", nimi: "Pinkki", filter: "hue-rotate(310deg) saturate(1.3)" },
+        { id: "violetti", nimi: "Violetti", filter: "hue-rotate(235deg)" }
+    ];
+    let kissaVari = "oranssi";
+
+    // Kissan muoto: pelkkä pää tai koko kissa. "tasot" kertoo, millainen kissa on askeleiden mukaan:
+    // [alle 3, 3–4, 5–9, 10–20, yli 20]. Jos tasoja ei ole, alle 3 askeleella arvotaan hymyilevä pää.
+    const kissaMuodot = [
+        { id: "paa", nimi: "Hymykissa", idle: "😺", vaarin: "🙀", tasot: null },
+        { id: "kavely", nimi: "Kävelevä", idle: "🐈", vaarin: "🐈", tasot: ["🐈", "🐈", "🐆", "🦁", "🐅"] },
+        { id: "leijona", nimi: "Leijona", idle: "🦁", vaarin: "🦁", tasot: ["🦁", "🦁", "🦁", "🦁", "🐯"] },
+        { id: "tiikeri", nimi: "Tiikeri", idle: "🐅", vaarin: "🐅", tasot: ["🐅", "🐅", "🐅", "🐅", "🐅"] },
+        { id: "pantteri", nimi: "Pantteri", idle: "🐆", vaarin: "🐆", tasot: ["🐆", "🐆", "🐆", "🦁", "🐅"] }
+    ];
+    let kissaMuoto = "paa";
+
+    function haeMuoto(id) {
+        return kissaMuodot.find(m => m.id === id) || kissaMuodot[0];
+    }
+
+    // Onko emoji koko kissa (ei pelkkä pää)? Silloin hattu ja lasit näytetään yläpuolella.
+    function onVartalo(emoji) {
+        return ["🐈", "🐆", "🐅"].includes(emoji);
+    }
+
+    // Millainen kissa näkyy, kun vastaa oikein ja askeleita on tämän verran?
+    function ilmeKissalle(askeleet) {
+        const m = haeMuoto(kissaMuoto);
+        if (!m.tasot) {
+            // hymykissa: oma, tuttu kehitys
+            if (askeleet > 20) return "🐯";
+            if (askeleet >= 10) return "🦁";
+            if (askeleet >= 5) return "😻";
+            if (askeleet >= 3) return "😺";
+            return kissaReaktiot[Math.floor(Math.random() * kissaReaktiot.length)];
+        }
+        if (askeleet > 20) return m.tasot[4];
+        if (askeleet >= 10) return m.tasot[3];
+        if (askeleet >= 5) return m.tasot[2];
+        if (askeleet >= 3) return m.tasot[1];
+        return m.tasot[0];
+    }
+
+    function paivitaKissanMuoto() {
+        const m = haeMuoto(kissaMuoto);
+        document.getElementById("kissa-naama").innerText = m.idle;
+        document.getElementById("kissa-iso").classList.toggle("vartalo", onVartalo(m.idle));
+    }
+
+    function haeKissaVari(id) {
+        return kissaVarit.find(k => k.id === id) || kissaVarit[0];
+    }
+
+    function paivitaKissanVari() {
+        document.getElementById("kissa-naama").style.filter = haeKissaVari(kissaVari).filter;
+    }
+
+    function piirraKissaValikko() {
+        // muodot
+        const muodot = document.getElementById("kissa-muodot");
+        muodot.innerHTML = "";
+        const nykyinenSuodatin = haeKissaVari(kissaVari).filter;
+        for (const m of kissaMuodot) {
+            const nappi = document.createElement("button");
+            nappi.className = "teema-kortti" + (m.id === kissaMuoto ? " valittu" : "");
+            nappi.style.background = "var(--paneeli2)";
+            const e = document.createElement("span");
+            e.className = "teema-emoji";
+            e.style.fontSize = "2.2em";
+            e.style.filter = nykyinenSuodatin;
+            e.innerText = m.idle;
+            const n = document.createElement("span");
+            n.innerText = m.nimi;
+            nappi.append(e, n);
+            nappi.onclick = () => valitseMuoto(m.id);
+            muodot.appendChild(nappi);
+        }
+
+        // värit
+        const alue = document.getElementById("kissa-ruudukko");
+        alue.innerHTML = "";
+        for (const k of kissaVarit) {
+            const nappi = document.createElement("button");
+            nappi.className = "teema-kortti" + (k.id === kissaVari ? " valittu" : "");
+            nappi.style.background = "var(--paneeli2)";
+            const e = document.createElement("span");
+            e.className = "teema-emoji";
+            e.style.fontSize = "2.2em";
+            e.style.filter = k.filter;
+            e.innerText = haeMuoto(kissaMuoto).idle;
+            const n = document.createElement("span");
+            n.innerText = k.nimi;
+            nappi.append(e, n);
+            nappi.onclick = () => valitseKissa(k.id);
+            alue.appendChild(nappi);
+        }
+    }
+
+    function valitseKissa(id) {
+        if (!vahtiLapi) return; // valinta onnistuu vasta, kun vahdin laskut on ratkaistu
+        kissaVari = haeKissaVari(id).id;
+        paivitaKissanVari();
+        tallenna();
+        piirraKissaValikko();
+    }
+
+    function valitseMuoto(id) {
+        if (!vahtiLapi) return; // valinta onnistuu vasta, kun vahdin laskut on ratkaistu
+        kissaMuoto = haeMuoto(id).id;
+        paivitaKissanMuoto();
+        tallenna();
+        piirraKissaValikko();
+    }
+
+    // ---------- Kissavalinnan vahti ----------
+    // Ensin yhteenlasku (luvut alle 10), sitten kertolasku (tulo alle 100). Vasta sitten valinta onnistuu.
+    let vahtiLapi = false;   // onko vahti ohitettu tällä kertaa
+    let vahtiVaihe = 0;      // 1 = yhteenlasku, 2 = kertolasku
+    let vahtiVastaus = 0;
+
+    function satunnainen(ala, yla) {
+        return ala + Math.floor(Math.random() * (yla - ala + 1));
+    }
+
+    function uusiVahtiTehtava() {
+        let teksti;
+        if (vahtiVaihe === 1) {
+            const a = satunnainen(1, 9);   // alle 10
+            const b = satunnainen(1, 9);   // alle 10
+            vahtiVastaus = a + b;
+            teksti = `➕ ${a} + ${b} = ?`;
+        } else {
+            const a = satunnainen(2, 9);   // 2–9, joten tulo on enintään 81 (alle 100)
+            const b = satunnainen(2, 9);
+            vahtiVastaus = a * b;
+            teksti = `✖️ ${a} × ${b} = ?`;
+        }
+        document.getElementById("vahti-tehtava").innerText = teksti;
+        const syote = document.getElementById("vahti-syote");
+        syote.value = "";
+        syote.focus();
+    }
+
+    function tarkistaVahti() {
+        if (vahtiVaihe === 0 || vahtiLapi) return;
+        const syote = document.getElementById("vahti-syote");
+        const viesti = document.getElementById("vahti-viesti");
+        const vastaus = parseInt(syote.value);
+        if (isNaN(vastaus)) {
+            viesti.innerText = "Kirjoita ensin numero! 🐱";
+            syote.focus();
+            return;
+        }
+        if (vastaus !== vahtiVastaus) {
+            viesti.innerText = "Hups, ei ihan. Yritä uudelleen! 🐾";
+            syote.value = "";
+            syote.focus();
+            return;
+        }
+        if (vahtiVaihe === 1) {
+            vahtiVaihe = 2;
+            viesti.innerText = "Oikein! ✅ Vielä yksi lasku.";
+            uusiVahtiTehtava();
+        } else {
+            // molemmat laskut oikein: valinta aukeaa
+            vahtiLapi = true;
+            document.getElementById("kissa-vahti").hidden = true;
+            document.getElementById("kissa-valinta").hidden = false;
+            document.getElementById("kissa-sulje").innerText = "Valmis ✅";
+            piirraKissaValikko();
+        }
+    }
+
+    document.getElementById("vahti-syote").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); tarkistaVahti(); }
+    });
+
+    function avaaKissaValikko() {
+        // joka kerta uusi vahti
+        vahtiLapi = false;
+        vahtiVaihe = 1;
+        document.getElementById("kissa-vahti").hidden = false;
+        document.getElementById("kissa-valinta").hidden = true;
+        document.getElementById("kissa-sulje").innerText = "Peruuta";
+        document.getElementById("vahti-viesti").innerText = "";
+        document.getElementById("kissa-ikkuna").hidden = false;
+        uusiVahtiTehtava();
+    }
+
+    function suljeKissaValikko() {
+        document.getElementById("kissa-ikkuna").hidden = true;
+        vahtiLapi = false;
+        vahtiVaihe = 0;
+        document.getElementById("vastaus").focus();
+    }
+
     // ---------- Peli alusta ----------
     function avaaAlustaKysymys() {
         document.getElementById("alusta-ikkuna").hidden = false;
@@ -1220,10 +1682,11 @@
         const palaute = document.getElementById("palaute");
         palaute.innerText = "";
         palaute.className = "palaute";
-        document.getElementById("kissa-naama").innerText = "😺";
+        paivitaKissanMuoto();
         paivitaKalat();
         paivitaKissa();
         suljeAlustaKysymys();
+        tallenna(); // teema säilyy, muu alkaa alusta
         uusiLasku();
     }
 
@@ -1430,7 +1893,7 @@
         huone.querySelectorAll(".leikkikalu").forEach(el => {
             el.onclick = () => kosketaLeikkikalua(el.dataset.leikki);
         });
-        const naamaNyt = document.getElementById("kissa-naama").innerText;
+        const naamaNyt = haeMuoto(kissaMuoto).idle; // oma kissa asuu kotona perusmuodossaan
         const alku = Math.max(0, kodinKissat.length - 24); // enintään 24 kissaa kerralla näkyvissä
         const nakyvat = kodinKissat.slice(alku);
         const kaikki = [
@@ -1464,6 +1927,10 @@
     }
 
     lataa();
+    asetaTeema(teema, false);
+    paivitaTilaNapit();
+    paivitaKissanVari();
+    paivitaKissanMuoto();
     paivitaKalat();
     paivitaKissa();
 
