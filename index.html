@@ -242,6 +242,31 @@
             70% { transform: scale(0.9) rotate(var(--k, 0deg)); opacity: 1; }
             100% { transform: scale(1) rotate(var(--k, 0deg)); }
         }
+        /* Kultainen kala */
+        .kultakala {
+            position: absolute;
+            left: 50%;
+            top: 42%;
+            width: 110px;
+            z-index: 7;
+            pointer-events: none;
+            filter: drop-shadow(0 0 12px #ffd43b);
+            animation: kultakala-nousee 1.7s ease-out forwards;
+        }
+        .kultakala img { width: 100%; height: auto; display: block; }
+        .kultakala::before, .kultakala::after {
+            content: "✨";
+            position: absolute;
+            font-size: 28px;
+        }
+        .kultakala::before { left: -26px; top: -12px; }
+        .kultakala::after { right: -22px; bottom: -10px; }
+        @keyframes kultakala-nousee {
+            0% { transform: translate(-50%, -50%) scale(0.2) rotate(-25deg); opacity: 0; }
+            22% { transform: translate(-50%, -50%) scale(1.3) rotate(8deg); opacity: 1; }
+            55% { transform: translate(-50%, -50%) scale(1) rotate(-4deg); opacity: 1; }
+            100% { transform: translate(-50%, -190%) scale(0.9) rotate(0deg); opacity: 0; }
+        }
         .ilmoitus {
             position: absolute;
             top: 10px;
@@ -715,6 +740,8 @@
                 <li>Jokaisesta oikeasta vastauksesta saat <b>1 kalan</b>.</li>
                 <li><b>🐾 Askeleet</b> kertovat, montako oikeaa vastausta olet saanut peräkkäin. Väärä vastaus nollaa ne.</li>
                 <li>Joka <b>10. askeleesta</b> saat yhden ylimääräisen kalan.</li>
+                <li>Joskus oikeasta vastauksesta tulee <b>kultainen kala</b> ✨, joka on <b>viiden kalan</b> arvoinen!</li>
+                <li>Jos vastaat väärin, kuuluu matala "bu-bum"-ääni, ja kissa säikähtää.</li>
                 <li>Kissa muuttuu askelten mukana: 3 askelta 😺, 5 askelta 😻, 10 askelta 🦁 ja yli 20 askelta 🐯.</li>
             </ul>
 
@@ -976,7 +1003,9 @@
             pisteet++;
             putki++;
             annaLeima(); // uusi päivä: leima passiin
-            kalat++; // jokaisesta oikeasta vastauksesta saa kalan
+            // jokaisesta oikeasta vastauksesta saa kalan. Joskus tulee kultainen kala, joka on viiden kalan arvoinen.
+            const kultakala = arvoKultakala();
+            kalat += kultakala ? KULTAKALA_ARVO : 1;
             // joka 10. askel (10, 20, 30 ...) antaa lisäksi yhden ylimääräisen kalan
             const askelBonus = putki % 10 === 0;
             if (askelBonus) kalat++;
@@ -988,9 +1017,11 @@
             // Mitä pidempi putki, sitä innostuneempi kissa!
             const kissa = ilmeKissalle(putki);
             palauteEl.innerText = satunnainenKehuminen + " " + kissa + " Miau!" +
-                (askelBonus ? " " + putki + " askelta: +1 bonuskala 🐟" : "");
+                (askelBonus ? " " + putki + " askelta: +1 bonuskala 🐟" : "") +
+                (kultakala ? " ✨ KULTAINEN KALA! +" + KULTAKALA_ARVO + " 🐟" : "");
             animoiKissa(kissa, "kissa-hyppy");
             miau(putki < 10); // pieni pentu miukuu, leijona ja tiikeri möristävät
+            if (kultakala) naytaKultakala();
             palauteEl.className = "palaute oikein";
 
             // Annetaan palkinto joka 5. oikeasta vastauksesta
@@ -1010,6 +1041,7 @@
             palauteEl.innerText = `🙀 Hups! Yritä uudelleen! (Vinkki: ei ollut ${kayttajanVastaus}) `;
             palauteEl.className = "palaute vaarin";
             animoiKissa(haeMuoto(kissaMuoto).vaarin, "kissa-tutisee");
+            virheaani(); // matala "bu-bum" kun laskee väärin
             syote.value = "";
             syote.focus();
         }
@@ -1111,6 +1143,98 @@
         } catch (e) {
             // Jos ääni ei toimi, peli toimii silti ilman sitä
         }
+    }
+
+    // ---------- Äänet: väärä vastaus ja kultainen kala ----------
+    function aaniKonteksti() {
+        try {
+            if (!aani) aani = new (window.AudioContext || window.webkitAudioContext)();
+            if (aani.state === "suspended") aani.resume();
+            return aani;
+        } catch (e) {
+            return null; // peli toimii ilman ääntäkin
+        }
+    }
+
+    // Pehmeä, matala "bu-bum", kun vastaus on väärin
+    function virheaani() {
+        const ctx = aaniKonteksti();
+        if (!ctx) return;
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const suodatin = ctx.createBiquadFilter();
+        const voimakkuus = ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(330, t);
+        osc.frequency.linearRampToValueAtTime(280, t + 0.15);
+        osc.frequency.setValueAtTime(250, t + 0.2);
+        osc.frequency.linearRampToValueAtTime(150, t + 0.55);
+        suodatin.type = "lowpass";
+        suodatin.frequency.value = 900;
+        voimakkuus.gain.setValueAtTime(0.0001, t);
+        voimakkuus.gain.exponentialRampToValueAtTime(0.25, t + 0.04);
+        voimakkuus.gain.setValueAtTime(0.25, t + 0.4);
+        voimakkuus.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+        osc.connect(suodatin);
+        suodatin.connect(voimakkuus);
+        voimakkuus.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.65);
+    }
+
+    // Kimaltava nouseva kilahdus, kun saa kultaisen kalan
+    function kilahdus() {
+        const ctx = aaniKonteksti();
+        if (!ctx) return;
+        const alku = ctx.currentTime;
+        [1046.5, 1318.5, 1568, 2093].forEach((taajuus, i) => {
+            const t = alku + i * 0.09;
+            const osc = ctx.createOscillator();
+            const voimakkuus = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.value = taajuus;
+            voimakkuus.gain.setValueAtTime(0.0001, t);
+            voimakkuus.gain.exponentialRampToValueAtTime(0.18, t + 0.02);
+            voimakkuus.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+            osc.connect(voimakkuus);
+            voimakkuus.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.5);
+        });
+    }
+
+    // ---------- Kultainen kala ----------
+    const KULTAKALA_TODENNAKOISYYS = 0.1; // joka kymmenes oikea vastaus keskimäärin
+    const KULTAKALA_ARVO = 5;             // kultainen kala on viiden kalan arvoinen
+    const KULTAKALA_SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 40'>" +
+        "<defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'>" +
+        "<stop offset='0' stop-color='#fff3a8'/><stop offset='0.5' stop-color='#ffd43b'/><stop offset='1' stop-color='#f08c00'/>" +
+        "</linearGradient></defs>" +
+        "<polygon points='46,20 62,6 62,34' fill='url(#g)' stroke='#e67700' stroke-width='2' stroke-linejoin='round'/>" +
+        "<path d='M22 8 Q30 -2 40 9' fill='url(#g)' stroke='#e67700' stroke-width='2' stroke-linejoin='round'/>" +
+        "<ellipse cx='28' cy='20' rx='22' ry='14' fill='url(#g)' stroke='#e67700' stroke-width='2'/>" +
+        "<path d='M27 13 q4 7 0 14 M34 12 q4 8 0 16' stroke='#e67700' stroke-width='1.4' fill='none' opacity='0.55'/>" +
+        "<ellipse cx='24' cy='11.5' rx='7' ry='2.4' fill='#fff' opacity='0.65'/>" +
+        "<circle cx='15' cy='17' r='3.2' fill='#fff'/><circle cx='14.4' cy='17' r='1.7' fill='#073b4c'/>" +
+        "<path d='M7 23 q3 2 5 0' stroke='#e67700' stroke-width='1.5' fill='none' stroke-linecap='round'/>" +
+        "</svg>";
+
+    // Tuleeko tällä kertaa kultainen kala? (omana funktionaan, jotta sen voi helposti testata)
+    function arvoKultakala() {
+        return Math.random() < KULTAKALA_TODENNAKOISYYS;
+    }
+
+    function naytaKultakala() {
+        const laatikko = document.querySelector(".peli-laatikko");
+        const el = document.createElement("div");
+        el.className = "kultakala";
+        const img = new Image();
+        img.src = "data:image/svg+xml," + encodeURIComponent(KULTAKALA_SVG);
+        img.alt = "Kultainen kala";
+        el.appendChild(img);
+        laatikko.appendChild(el);
+        setTimeout(() => el.remove(), 1800);
+        setTimeout(kilahdus, 120); // kilahdus soi vähän miauksen jälkeen
     }
 
     // Iso kissa reagoi vastauksiin
